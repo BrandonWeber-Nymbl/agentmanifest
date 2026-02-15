@@ -17,8 +17,13 @@ interface ValidationResult {
 }
 
 export async function validateAPI(url: string): Promise<ValidationResult> {
-  const validatorUrl =
+  let validatorUrl =
     process.env.VALIDATOR_URL || 'http://localhost:3001';
+
+  // Ensure validatorUrl has a protocol
+  if (!validatorUrl.startsWith('http://') && !validatorUrl.startsWith('https://')) {
+    validatorUrl = `https://${validatorUrl}`;
+  }
 
   try {
     const response = await fetch(`${validatorUrl}/validate`, {
