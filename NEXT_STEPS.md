@@ -45,7 +45,7 @@ The complete AgentManifest infrastructure is now ready:
 **Current Status**: BakeBase doesn't have the `/.well-known/agent-manifest.json` endpoint yet.
 
 **Action Required**:
-1. Clone the BakeBase repository (https://github.com/BrandonWeber-Nymbl/BakeBase)
+1. Clone the BakeBase repository (https://github.com/AMProtocol/BakeBase)
 2. Follow the instructions in `BAKEBASE_INTEGRATION.md`
 3. Use the manifest in `BAKEBASE_MANIFEST.json` as a starting point
 4. Update the manifest to match BakeBase's actual endpoints
@@ -171,7 +171,7 @@ curl -X POST https://your-registry-url.railway.app/listings/submit \
 - [ ] Design clearinghouse settlement logic
 
 ### Phase 3: Ecosystem Growth (Next 6-12 months)
-- [ ] Launch public registry at agentmanifest.org
+- [ ] Public registry live at agent-manifest.com
 - [ ] Create developer portal with guides
 - [ ] Build example APIs in different domains
 - [ ] Establish governance model for spec evolution
@@ -309,7 +309,7 @@ npm run db:setup                  # Full database setup
 
 ## 💡 Questions / Decisions Needed
 
-1. **Domain**: Should the registry be at a custom domain (e.g., registry.agentmanifest.org)?
+1. **Domain**: Registry is live at `agent-manifest.com`. Consider adding `registry.agentmanifest.org` as an alias?
 2. **Governance**: Who maintains the spec? How are changes proposed?
 3. **Payments**: When to start building compensation protocol?
 4. **Open Source**: License confirmed as MIT for code, CC0 for spec?

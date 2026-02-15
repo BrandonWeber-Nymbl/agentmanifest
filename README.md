@@ -157,7 +157,7 @@ Fix any errors reported by the validator.
 ### Step 3: Submit to the Registry
 
 ```bash
-curl -X POST https://registry.agentmanifest.org/listings/submit \
+curl -X POST https://agent-manifest.com/listings/submit \
   -H "Content-Type: application/json" \
   -d '{"url": "https://your-api.com"}'
 ```
@@ -165,7 +165,7 @@ curl -X POST https://registry.agentmanifest.org/listings/submit \
 You'll receive a `submission_id`. Check its status:
 
 ```bash
-curl https://registry.agentmanifest.org/listings/submit/{submission_id}/status
+curl https://agent-manifest.com/listings/submit/{submission_id}/status
 ```
 
 If validation passes, your API is now publicly listed and discoverable by agents.
@@ -283,7 +283,7 @@ This is how knowledge workers get compensated in the agent economy. Not by being
 
 - Live URL: `https://bakebase-production.up.railway.app`
 - Manifest: `https://bakebase-production.up.railway.app/.well-known/agent-manifest.json`
-- GitHub: `https://github.com/BrandonWeber-Nymbl/BakeBase`
+- GitHub: `https://github.com/AMProtocol/BakeBase`
 
 Use it to test validator and registry integration.
 
@@ -291,14 +291,11 @@ Use it to test validator and registry integration.
 
 ## Contributing
 
-This is an open protocol. Contributions welcome:
-- Spec improvements and clarifications
-- Validator enhancements
-- Registry features
-- Documentation
-- Reference implementations in other domains
+This is an open protocol. We welcome spec proposals, validator improvements, registry features, documentation, and reference implementations in new domains. Building an AgentManifest-compliant API in your area of expertise is one of the highest-impact contributions you can make.
 
-Open an issue or PR at: [github.com/agentmanifest/agentmanifest]
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, PR guidelines, and how to propose spec changes.
+
+Open an issue or PR at: [github.com/AMProtocol/agentmanifest](https://github.com/AMProtocol/agentmanifest)
 
 ---
 
@@ -311,6 +308,6 @@ Open an issue or PR at: [github.com/agentmanifest/agentmanifest]
 
 ## Contact
 
-For questions, issues, or partnership inquiries: [contact information]
+For questions, issues, or partnership inquiries: [Open an issue](https://github.com/AMProtocol/agentmanifest/issues) or email brandon.weber@nymbl.app
 
 **Build for agents. Build for the long run. Build in the open.**

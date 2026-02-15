@@ -168,7 +168,7 @@ app.get('/categories', async (req: Request, res: Response) => {
 // GET /spec - Redirect to spec documentation
 app.get('/spec', (req: Request, res: Response) => {
   res.redirect(
-    'https://github.com/agentmanifest/spec/blob/main/v0.1.md'
+    'https://github.com/AMProtocol/agentmanifest/blob/main/spec/v0.1.md'
   );
 });
 

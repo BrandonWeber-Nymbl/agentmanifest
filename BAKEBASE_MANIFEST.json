@@ -70,7 +70,7 @@
       "queries_per_month": null
     },
     "paid_tier": null,
-    "support_url": "https://github.com/BrandonWeber-Nymbl/BakeBase"
+    "support_url": "https://github.com/AMProtocol/BakeBase"
   },
   "authentication": {
     "required": false,
@@ -83,7 +83,7 @@
     "expected_uptime_pct": 99.0
   },
   "agent_notes": "BakeBase is optimized for AI agents building food and recipe applications. When using the /combine endpoint, provide 2-5 ingredients for best results - the analysis considers chemical reactions, functional interactions, and recommended usage ratios. All hydration ratios assume room temperature water unless otherwise specified. pH ranges are typical values and can vary by brand or processing method. For substitution recommendations, always consider the functional role of the ingredient in the specific recipe context. The data focuses on functional properties rather than nutritional information. Use category endpoints to discover available ingredients before querying specific items.",
-  "contact": "https://github.com/BrandonWeber-Nymbl/BakeBase",
+  "contact": "https://github.com/AMProtocol/BakeBase",
   "listing_requested": true,
   "last_updated": "2025-02-15T10:00:00Z"
 }

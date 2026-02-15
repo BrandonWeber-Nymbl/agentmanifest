@@ -19,7 +19,7 @@ async function main() {
       pricing_model: 'free',
       auth_required: false,
       maintained_by: 'individual',
-      contact: 'https://github.com/BrandonWeber-Nymbl/BakeBase',
+      contact: 'https://github.com/AMProtocol/BakeBase',
       manifest: {
         // This will be populated during actual validation
         // For seed purposes, we're using a placeholder

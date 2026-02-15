@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "$id": "https://agentmanifest.org/schemas/v0.1/manifest.json",
+  "$id": "https://agent-manifest.com/schemas/v0.1/manifest.json",
   "title": "Agent Manifest",
   "description": "Schema for AgentManifest v0.1 specification",
   "type": "object",
