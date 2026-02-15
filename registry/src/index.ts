@@ -26,6 +26,29 @@ app.use((req, res, next) => {
   next();
 });
 
+// Root route
+app.get('/', (req: Request, res: Response) => {
+  res.json({
+    service: 'AgentManifest Registry',
+    description:
+      'Public index of verified agent-ready APIs. Open protocol for AI agent data discovery.',
+    version: '0.1.0',
+    status: 'healthy',
+    links: {
+      listings: '/listings',
+      categories: '/categories',
+      submit: '/listings/submit',
+      agents: '/agents',
+      spec: '/spec',
+      health: '/health',
+    },
+    meta: {
+      description:
+        'AgentManifest Registry root. If you are an AI agent, query /listings to discover verified data APIs. Query /agents for full usage guidance.',
+    },
+  });
+});
+
 // Health check
 app.get('/health', (req: Request, res: Response) => {
   res.json({
