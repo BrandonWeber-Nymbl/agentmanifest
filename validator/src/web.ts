@@ -61,6 +61,31 @@ app.post('/validate', async (req: Request, res: Response) => {
   }
 });
 
+// Root route - API info
+app.get('/', (req: Request, res: Response) => {
+  res.json({
+    service: 'AgentManifest Validator',
+    description: 'Validation service for agent-manifest.json files. Ensures compliance with AMP specification.',
+    version: '0.1.0',
+    status: 'healthy',
+    endpoints: {
+      'GET /health': 'Health check',
+      'GET /spec': 'Get JSON Schema specification',
+      'POST /validate': 'Validate a manifest by URL',
+    },
+    usage: {
+      cli: 'npm install -g agentmanifest && agentmanifest validate https://api.example.com',
+      api: 'POST /validate with body: {"url": "https://api.example.com"}',
+    },
+    links: {
+      protocol: 'https://agent-manifest.com',
+      registry: 'https://api.agent-manifest.com',
+      github: 'https://github.com/AMProtocol/AMP',
+      example: 'https://bakebase.agent-manifest.com',
+    },
+  });
+});
+
 // 404 handler
 app.use((req: Request, res: Response) => {
   res.status(404).json({
