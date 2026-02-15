@@ -1,3 +1,7 @@
+**AMP — Agent Manifest Protocol**  
+Created by Brandon Weber · February 2026  
+Spec licensed CC BY 4.0 · Code licensed MIT
+
 # AgentManifest
 
 **Open protocol and registry for the AI agent data economy**
