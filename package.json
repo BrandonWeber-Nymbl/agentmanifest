@@ -10,6 +10,8 @@
   "scripts": {
     "dev:validator": "npm run dev --workspace=validator",
     "dev:registry": "npm run dev --workspace=registry",
+    "start:web": "npm run start:web --workspace=validator",
+    "start": "npm run start --workspace=registry",
     "build": "npm run build --workspaces",
     "test": "npm test --workspaces",
     "docker:up": "docker-compose up -d",
