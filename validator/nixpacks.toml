@@ -1,3 +1,4 @@
+# Updated config - validator service
 [phases.setup]
 nixPkgs = ["nodejs-18_x"]
 
