@@ -11,6 +11,7 @@
     "dev": "tsx watch src/web.ts",
     "build": "tsc",
     "cli": "tsx src/cli.ts",
+    "start": "node dist/web.js",
     "start:web": "node dist/web.js",
     "test": "echo \"Add tests\" && exit 0"
   },
