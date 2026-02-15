@@ -42,6 +42,13 @@ interface ManifestData {
     paid_tier?: any;
     support_url?: string;
   };
+  payment?: {
+    provider?: string;
+    checkout_url?: string;
+    key_provisioning_url?: string;
+    accepted_methods?: string[];
+    prepay_required?: boolean;
+  };
   authentication?: {
     required: boolean;
     type?: string | null;
@@ -513,6 +520,65 @@ function checkAuthenticationConsistency(manifest: ManifestData): ValidationCheck
   };
 }
 
+function checkPaymentConsistency(manifest: ManifestData): ValidationCheck[] {
+  const checks: ValidationCheck[] = [];
+
+  // Payment field is optional, so if not present, that's fine
+  if (!manifest.payment) {
+    return checks;
+  }
+
+  // If payment is present, checkout_url is required
+  if (!manifest.payment.checkout_url) {
+    checks.push({
+      name: 'payment_checkout_url',
+      passed: false,
+      message: 'Payment object present but checkout_url is missing (required when payment is specified)',
+      severity: 'error',
+    });
+  } else {
+    // Validate checkout_url is a valid URL
+    try {
+      new URL(manifest.payment.checkout_url);
+      checks.push({
+        name: 'payment_checkout_url',
+        passed: true,
+        message: 'Payment checkout_url is valid',
+        severity: 'info',
+      });
+    } catch {
+      checks.push({
+        name: 'payment_checkout_url',
+        passed: false,
+        message: 'Payment checkout_url is not a valid URL',
+        severity: 'error',
+      });
+    }
+  }
+
+  // Validate key_provisioning_url if present
+  if (manifest.payment.key_provisioning_url) {
+    try {
+      new URL(manifest.payment.key_provisioning_url);
+      checks.push({
+        name: 'payment_key_provisioning_url',
+        passed: true,
+        message: 'Payment key_provisioning_url is valid',
+        severity: 'info',
+      });
+    } catch {
+      checks.push({
+        name: 'payment_key_provisioning_url',
+        passed: false,
+        message: 'Payment key_provisioning_url is not a valid URL',
+        severity: 'error',
+      });
+    }
+  }
+
+  return checks;
+}
+
 function generateVerificationToken(
   url: string,
   validatedAt: string,
@@ -579,6 +645,9 @@ export async function validateManifest(url: string): Promise<ValidationResult> {
 
   // 8. Authentication consistency
   checks.push(checkAuthenticationConsistency(manifest));
+
+  // 9. Payment consistency
+  checks.push(...checkPaymentConsistency(manifest));
 
   // Determine if validation passed (all error-severity checks must pass)
   const passed = checks.every(

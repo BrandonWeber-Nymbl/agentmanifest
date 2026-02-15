@@ -195,6 +195,37 @@
       },
       "description": "Pricing information"
     },
+    "payment": {
+      "type": "object",
+      "properties": {
+        "provider": {
+          "type": "string",
+          "description": "Payment provider name"
+        },
+        "checkout_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL where agents can complete payment or purchase API access"
+        },
+        "key_provisioning_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL where agents can retrieve API keys after payment"
+        },
+        "accepted_methods": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Payment methods accepted (e.g., credit_card, crypto, paypal)"
+        },
+        "prepay_required": {
+          "type": "boolean",
+          "description": "Whether payment is required before API access"
+        }
+      },
+      "description": "Optional payment configuration for API access"
+    },
     "authentication": {
       "type": "object",
       "required": ["required"],
@@ -257,5 +288,20 @@
       "description": "ISO 8601 timestamp of last manifest update"
     }
   },
-  "additionalProperties": true
+  "additionalProperties": true,
+  "if": {
+    "properties": {
+      "payment": {
+        "type": "object"
+      }
+    },
+    "required": ["payment"]
+  },
+  "then": {
+    "properties": {
+      "payment": {
+        "required": ["checkout_url"]
+      }
+    }
+  }
 }
