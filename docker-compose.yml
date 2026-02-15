@@ -1,0 +1,72 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: agentmanifest-db
+    environment:
+      POSTGRES_USER: agentmanifest
+      POSTGRES_PASSWORD: agentmanifest_dev
+      POSTGRES_DB: agentmanifest_registry
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U agentmanifest"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  validator:
+    build:
+      context: .
+      dockerfile: ./validator/Dockerfile
+    container_name: agentmanifest-validator
+    ports:
+      - "3001:3001"
+    environment:
+      PORT: 3001
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      NODE_ENV: development
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  registry:
+    build:
+      context: .
+      dockerfile: ./registry/Dockerfile
+    container_name: agentmanifest-registry
+    ports:
+      - "3002:3002"
+    environment:
+      PORT: 3002
+      DATABASE_URL: postgresql://agentmanifest:agentmanifest_dev@postgres:5432/agentmanifest_registry
+      VALIDATOR_URL: http://validator:3001
+      REGISTRY_URL: http://localhost:3002
+      NODE_ENV: development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      validator:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    command: >
+      sh -c "
+        npm run prisma:generate &&
+        npm run prisma:push &&
+        npm run prisma:seed &&
+        npm start
+      "
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: agentmanifest-network

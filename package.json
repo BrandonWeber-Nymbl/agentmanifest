@@ -1,0 +1,29 @@
+{
+  "name": "agentmanifest",
+  "version": "0.1.0",
+  "description": "Open protocol and registry for AI agent data economy",
+  "private": true,
+  "workspaces": [
+    "validator",
+    "registry"
+  ],
+  "scripts": {
+    "dev:validator": "npm run dev --workspace=validator",
+    "dev:registry": "npm run dev --workspace=registry",
+    "build": "npm run build --workspaces",
+    "test": "npm test --workspaces",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "keywords": [
+    "ai-agents",
+    "api-registry",
+    "protocol",
+    "agent-manifest"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

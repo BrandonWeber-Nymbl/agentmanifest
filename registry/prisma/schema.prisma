@@ -1,0 +1,34 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Listing {
+  id                String   @id @default(cuid())
+  name              String
+  url               String   @unique
+  description       String
+  primary_category  String
+  categories        String[]
+  pricing_model     String
+  auth_required     Boolean
+  maintained_by     String
+  contact           String
+  manifest          Json
+  verification_token String?
+  verified_at       DateTime?
+  last_checked_at   DateTime?
+  check_status      String   @default("pending") // "verified" | "pending" | "failed" | "stale"
+  failure_reason    String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+
+  @@index([primary_category])
+  @@index([check_status])
+  @@index([pricing_model])
+  @@index([auth_required])
+}
