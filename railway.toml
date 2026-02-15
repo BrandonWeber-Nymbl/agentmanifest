@@ -1,7 +1,0 @@
-[build]
-builder = "nixpacks"
-buildCommand = "echo 'Build handled by individual services'"
-
-[deploy]
-startCommand = "echo 'Start handled by individual services'"
-restartPolicyType = "never"
