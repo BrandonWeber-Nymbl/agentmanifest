@@ -76,7 +76,7 @@ The `spec/` directory at the root is the canonical source for the specification 
 
 1. **One concern per PR.** Don't mix a spec change with a code refactor.
 2. **Describe the "why."** The PR description should explain what problem you're solving, not just what you changed.
-3. **Test your changes.** Run the validator against BakeBase (`npm run cli -- validate https://bakebase-production.up.railway.app`) and verify the registry endpoints still work.
+3. **Test your changes.** Run the validator against a compliant API (`npm run cli -- validate https://bakebase.agent-manifest.com`) and verify the registry endpoints still work.
 4. **Keep the spec stable.** Changes to `spec/v0.1.md` or `spec/schema.json` have downstream effects on every existing manifest. We take spec changes seriously — open an issue to discuss before submitting a PR.
 
 ## Proposing Spec Changes

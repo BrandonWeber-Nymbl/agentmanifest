@@ -23,76 +23,40 @@ The complete AgentManifest infrastructure is now ready:
 - ✅ Submission workflow with async validation
 - ✅ Category browsing and search
 - ✅ Agent-friendly `/agents` endpoint
-- ✅ Seed data with BakeBase placeholder
+- ✅ Seed data for local development
 
 ### 4. **Infrastructure (Complete)**
 - ✅ Docker Compose for local development
-- ✅ Railway deployment configuration
-- ✅ Dockerfiles for both services
+- ✅ Railway deployment (Nixpacks)
 - ✅ Environment variable documentation
 
 ### 5. **Documentation (Complete)**
 - ✅ Comprehensive README with vision and quickstart
 - ✅ SETUP.md for installation and deployment
-- ✅ BAKEBASE_INTEGRATION.md for adding manifest to BakeBase
-- ✅ Example manifest (`BAKEBASE_MANIFEST.json`)
 - ✅ Test manifest for validation testing
 
-## 🚀 Immediate Next Steps
-
-### Step 1: Add Manifest to BakeBase (Required for end-to-end testing)
-
-**Current Status**: BakeBase doesn't have the `/.well-known/agent-manifest.json` endpoint yet.
-
-**Action Required**:
-1. Clone the BakeBase repository (https://github.com/AMProtocol/BakeBase)
-2. Follow the instructions in `BAKEBASE_INTEGRATION.md`
-3. Use the manifest in `BAKEBASE_MANIFEST.json` as a starting point
-4. Update the manifest to match BakeBase's actual endpoints
-5. Deploy to Railway
-6. Verify it's accessible at: `https://bakebase-production.up.railway.app/.well-known/agent-manifest.json`
-
-**Estimated Time**: 15-30 minutes
-
-### Step 2: Test the Complete Flow Locally
-
-Once BakeBase has the manifest:
+## 🚀 Test the Complete Flow Locally
 
 ```bash
-# 1. Start local infrastructure
+# 1. Start local infrastructure (or use manual setup)
 cd agentmanifest
-docker-compose up -d
+docker-compose up -d   # if Docker is configured
 
-# 2. Validate BakeBase
+# 2. Validate an API
 cd validator
-npm run cli -- validate https://bakebase-production.up.railway.app
+npm run cli -- validate https://your-api.com
 
-# 3. Should see:
-# ✓ Manifest reachability
-# ✓ Schema validity
-# ✓ Spec version
-# ✓ Description quality
-# ✓ Endpoint reachability (for GET endpoints)
-# ✓ Pricing consistency
-# ✓ Category validity
-# ✓ Authentication consistency
-#
-# PASSED ✓
-# Verification token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-
-# 4. Submit to local registry
+# 3. Submit to local registry
 curl -X POST http://localhost:3002/listings/submit \
   -H "Content-Type: application/json" \
-  -d '{"url": "https://bakebase-production.up.railway.app"}'
+  -d '{"url": "https://your-api.com"}'
 
-# 5. Check submission status
+# 4. Check submission status
 curl http://localhost:3002/listings/submit/{submission_id}/status
 
-# 6. Verify listing appears
+# 5. Verify listing appears
 curl http://localhost:3002/listings
 ```
-
-**Estimated Time**: 10 minutes
 
 ### Step 3: Deploy to Production (Railway)
 
@@ -137,16 +101,16 @@ curl http://localhost:3002/listings
 
 ```bash
 # Test validator
-curl https://your-validator-url.railway.app/health
+curl https://validator.agent-manifest.com/health
 
 # Test registry
-curl https://your-registry-url.railway.app/health
-curl https://your-registry-url.railway.app/listings
+curl https://api.agent-manifest.com/health
+curl https://api.agent-manifest.com/listings
 
-# Submit BakeBase to production registry
-curl -X POST https://your-registry-url.railway.app/listings/submit \
+# Submit an API to production registry
+curl -X POST https://api.agent-manifest.com/listings/submit \
   -H "Content-Type: application/json" \
-  -d '{"url": "https://bakebase-production.up.railway.app"}'
+  -d '{"url": "https://bakebase.agent-manifest.com"}'
 ```
 
 **Estimated Time**: 10 minutes
@@ -176,15 +140,15 @@ The original brief defined completion as:
 
 - [x] **Running validator CLI**
   ```bash
-  npx amp validate https://bakebase.your-url.com
+  npx amp validate https://your-api.com
   ```
-  ✅ Built and ready - **pending BakeBase manifest**
+  ✅ Built and ready
 
-- [x] **Local registry with BakeBase**
+- [x] **Local registry**
   ```bash
   curl http://localhost:3002/listings
   ```
-  ✅ Works - BakeBase seeded (placeholder data until manifest added)
+  ✅ Works - seed data for local development
 
 - [x] **Submission workflow**
   ```bash
@@ -208,19 +172,15 @@ The original brief defined completion as:
 **To be fully operational, you need:**
 
 1. ✅ Infrastructure code (complete)
-2. ⏳ BakeBase manifest endpoint (requires ~30 min work)
-3. ⏳ Production deployment (requires ~30 min setup)
-4. ⏳ Public domain for registry (optional but recommended)
-
-**Total time to full launch from now: ~1-2 hours**
+2. ✅ Production deployment (Railway with Nixpacks)
+3. ⏳ Public domain for registry (optional but recommended)
 
 ## 🤝 Recommended Actions
 
-### Immediate (This Week)
-1. Add manifest to BakeBase (see `BAKEBASE_INTEGRATION.md`)
-2. Test validator against BakeBase locally
-3. Deploy to Railway production
-4. Validate end-to-end flow
+### Immediate
+1. Deploy to Railway production (see DEPLOYMENT_CHECKLIST.md)
+2. Submit APIs via POST /listings/submit
+3. Validate end-to-end flow
 
 ### Short-term (This Month)
 1. Create a second reference API to test multi-listing
@@ -240,12 +200,10 @@ The original brief defined completion as:
 
 - **`README.md`** - Project overview and quickstart
 - **`SETUP.md`** - Complete installation guide
-- **`BAKEBASE_INTEGRATION.md`** - How to add manifest to BakeBase
 - **`spec/v0.1.md`** - Full specification document
 - **`spec/schema.json`** - JSON Schema for validation
 - **`validator/README.md`** - Validator documentation
 - **`registry/README.md`** - Registry API documentation
-- **`BAKEBASE_MANIFEST.json`** - Example manifest for BakeBase
 - **`test-manifest.json`** - Minimal test manifest
 
 ## 🔧 Development Commands
@@ -273,7 +231,6 @@ npm run db:setup                  # Full database setup
 ## 🎬 What Success Looks Like
 
 **Week 1**:
-- BakeBase has manifest and passes validation
 - Registry is deployed and publicly accessible
 - First successful submission via public registry
 
@@ -294,10 +251,7 @@ npm run db:setup                  # Full database setup
 
 ## 🚨 Blockers / Dependencies
 
-**Current Blockers**:
-1. BakeBase needs manifest endpoint (blocks end-to-end testing)
-
-**No Other Blockers** - All infrastructure is ready!
+**No current blockers** - All infrastructure is ready.
 
 ## 💡 Questions / Decisions Needed
 
@@ -308,4 +262,4 @@ npm run db:setup                  # Full database setup
 
 ---
 
-**Bottom Line**: The infrastructure is complete, tested, and ready. The only thing blocking full end-to-end validation is adding the manifest endpoint to BakeBase (30 minutes). After that, you're ready to deploy and launch publicly.
+**Bottom Line**: The infrastructure is complete, tested, and ready for deployment and public launch.

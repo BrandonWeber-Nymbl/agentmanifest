@@ -14,11 +14,11 @@ npm install @agentmanifest/validator
 
 ```bash
 # Using npx (no installation needed)
-npx amp validate https://api.example.com
+npx amp validate https://bakebase.agent-manifest.com
 
 # Or install globally
 npm install -g @agentmanifest/cli
-amp validate https://api.example.com
+amp validate https://bakebase.agent-manifest.com
 ```
 
 ### As a Library
@@ -26,7 +26,7 @@ amp validate https://api.example.com
 ```typescript
 import { validateManifest } from '@agentmanifest/validator';
 
-const result = await validateManifest('https://api.example.com');
+const result = await validateManifest('https://bakebase.agent-manifest.com');
 
 if (result.passed) {
   console.log('Validation passed!');
@@ -63,7 +63,7 @@ npm run start:web
 ```bash
 curl -X POST http://localhost:3001/validate \
   -H "Content-Type: application/json" \
-  -d '{"url": "https://api.example.com"}'
+  -d '{"url": "https://bakebase.agent-manifest.com"}'
 ```
 
 ## Validation Checks

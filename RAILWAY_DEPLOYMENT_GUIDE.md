@@ -104,19 +104,19 @@ Once deployed, test both services:
 
 ```bash
 # Validator health check
-curl https://agentmanifestvalidator-production.up.railway.app/health
+curl https://validator.agent-manifest.com/health
 
 # Expected response:
 {"status":"ok","service":"agentmanifest-validator","timestamp":"..."}
 
 # Registry health check
-curl https://agentmanifestregistry-production.up.railway.app/health
+curl https://api.agent-manifest.com/health
 
 # Expected response:
 {"status":"ok","service":"agentmanifest-registry","timestamp":"...","database":"connected"}
 
 # List categories
-curl https://agentmanifestregistry-production.up.railway.app/categories
+curl https://api.agent-manifest.com/categories
 
 # Expected response:
 {"categories":["data","automation","messaging","ai",...]}
@@ -149,26 +149,24 @@ curl https://agentmanifestregistry-production.up.railway.app/categories
 ### Registry
 - `PORT`: 3002 (auto-set by Railway)
 - `DATABASE_URL`: (auto-set when database is linked)
-- `VALIDATOR_URL`: http://agentmanifestvalidator-production.up.railway.app
-- `REGISTRY_URL`: https://agentmanifestregistry-production.up.railway.app
+- `VALIDATOR_URL`: https://validator.agent-manifest.com
+- `REGISTRY_URL`: https://api.agent-manifest.com
 - `NODE_ENV`: production
 
 ## Next Steps After Deployment
 
 1. **Test the validator**:
    ```bash
-   curl -X POST https://agentmanifestvalidator-production.up.railway.app/validate \
+   curl -X POST https://validator.agent-manifest.com/validate \
      -H "Content-Type: application/json" \
-     -d '{"url": "https://bakebase-production.up.railway.app/.well-known/agent-manifest.json"}'
+     -d '{"url": "https://bakebase.agent-manifest.com/.well-known/agent-manifest.json"}'
    ```
 
-2. **Add manifest to BakeBase** (follow `BAKEBASE_INTEGRATION.md`)
-
-3. **Submit BakeBase to registry**:
+2. **Submit an API to the registry**:
    ```bash
-   curl -X POST https://agentmanifestregistry-production.up.railway.app/listings/submit \
+   curl -X POST https://api.agent-manifest.com/listings/submit \
      -H "Content-Type: application/json" \
-     -d '{"manifestUrl": "https://bakebase-production.up.railway.app/.well-known/agent-manifest.json"}'
+     -d '{"url": "https://bakebase.agent-manifest.com"}'
    ```
 
 ## File Structure

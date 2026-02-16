@@ -22,7 +22,7 @@ echo "DATABASE_URL=postgresql://user:password@localhost:5432/agentmanifest_regis
 npm run prisma:generate
 npm run prisma:push
 
-# Seed with BakeBase
+# Seed database
 npm run prisma:seed
 
 # Start the registry

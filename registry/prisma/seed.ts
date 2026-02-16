@@ -5,30 +5,27 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
 
-  // Seed BakeBase as the first verified listing
-  const bakebase = await prisma.listing.upsert({
-    where: { url: 'https://bakebase-production.up.railway.app' },
+  // Seed a placeholder for local development (replace with real APIs via submission)
+  const example = await prisma.listing.upsert({
+    where: { url: 'https://api.example.com' },
     update: {},
     create: {
-      name: 'BakeBase',
-      url: 'https://bakebase-production.up.railway.app',
+      name: 'Example API',
+      url: 'https://api.example.com',
       description:
-        'AI-first food science reference API covering the functional properties of baking ingredients. Returns hydration ratios, protein interactions, leavening chemistry, pH profiles, substitution logic, and ingredient combination analysis. Designed for AI agents building food, recipe, and culinary applications.',
+        'Placeholder for local development. Submit real APIs via POST /listings/submit to populate the registry.',
       primary_category: 'reference',
-      categories: ['food-science', 'chemistry'],
+      categories: ['other'],
       pricing_model: 'free',
       auth_required: false,
       maintained_by: 'individual',
-      contact: 'https://github.com/AMProtocol/BakeBase',
+      contact: 'https://github.com/AMProtocol/agentmanifest',
       manifest: {
-        // This will be populated during actual validation
-        // For seed purposes, we're using a placeholder
         spec_version: 'agentmanifest-0.1',
-        name: 'BakeBase',
+        name: 'Example API',
         version: '1.0.0',
-        description:
-          'AI-first food science reference API covering the functional properties of baking ingredients.',
-        categories: ['food-science', 'chemistry'],
+        description: 'Placeholder manifest for local development.',
+        categories: ['other'],
         primary_category: 'reference',
       },
       check_status: 'verified',
@@ -37,7 +34,7 @@ async function main() {
     },
   });
 
-  console.log('✓ Seeded BakeBase:', bakebase.id);
+  console.log('✓ Seeded example listing:', example.id);
   console.log('\nDatabase seeding completed!');
 }
 

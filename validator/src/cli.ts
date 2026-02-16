@@ -33,8 +33,8 @@ function printUsage() {
   console.log('  npx agentmanifest validate <url>');
   console.log('  agentmanifest validate <url>\n');
   console.log('Examples:');
-  console.log('  npx agentmanifest validate https://api.example.com');
-  console.log('  npx agentmanifest validate api.example.com\n');
+  console.log('  npx agentmanifest validate https://bakebase.agent-manifest.com');
+  console.log('  npx agentmanifest validate bakebase.agent-manifest.com\n');
 }
 
 function getSeverityIcon(severity: string): string {

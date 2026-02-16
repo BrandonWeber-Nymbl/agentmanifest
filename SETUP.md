@@ -76,10 +76,10 @@ curl http://localhost:3001/health
 # Get spec schema
 curl http://localhost:3001/spec
 
-# Validate a test manifest (will fail - BakeBase doesn't have manifest yet)
+# Validate a manifest by URL
 curl -X POST http://localhost:3001/validate \
   -H "Content-Type: application/json" \
-  -d '{"url": "https://bakebase-production.up.railway.app"}'
+  -d '{"url": "https://your-api.com"}'
 ```
 
 ### Test the Registry
@@ -91,7 +91,7 @@ curl http://localhost:3002/health
 # Get agent instructions
 curl http://localhost:3002/agents
 
-# List all listings (should show BakeBase from seed)
+# List all listings
 curl http://localhost:3002/listings
 
 # Browse categories
@@ -165,19 +165,17 @@ npx prisma migrate reset
 npm run prisma:seed
 ```
 
-## Adding BakeBase Manifest
-
-Once BakeBase has the manifest endpoint:
+## Submitting an API to the Registry
 
 ```bash
-# Validate it
+# Validate your API
 cd validator
-npm run cli -- validate https://bakebase-production.up.railway.app
+npm run cli -- validate https://your-api.com
 
 # Submit to local registry
 curl -X POST http://localhost:3002/listings/submit \
   -H "Content-Type: application/json" \
-  -d '{"url": "https://bakebase-production.up.railway.app"}'
+  -d '{"url": "https://your-api.com"}'
 
 # Check submission status (use ID from response)
 curl http://localhost:3002/listings/submit/{submission_id}/status
@@ -229,7 +227,7 @@ curl http://localhost:3002/listings
 The registry will automatically:
 - Run Prisma migrations
 - Generate Prisma client
-- Seed with BakeBase
+- Seed database
 - Start the server
 
 ### Environment Variables
@@ -353,34 +351,31 @@ End-to-end test:
 curl http://localhost:3001/health
 curl http://localhost:3002/health
 
-# 2. Validate BakeBase (once manifest is added)
+# 2. Validate an API
 cd validator
-npm run cli -- validate https://bakebase-production.up.railway.app
+npm run cli -- validate https://your-api.com
 
-# 3. Should show all checks passing and receive verification token
-
-# 4. Submit to registry
+# 3. Submit to registry
 curl -X POST http://localhost:3002/listings/submit \
   -H "Content-Type: application/json" \
-  -d '{"url": "https://bakebase-production.up.railway.app"}'
+  -d '{"url": "https://your-api.com"}'
 
-# 5. Check status (use submission_id from response)
+# 4. Check status (use submission_id from response)
 curl http://localhost:3002/listings/submit/sub_xxxxx/status
 
-# 6. Query registry
+# 5. Query registry
 curl http://localhost:3002/listings
 
-# 7. Get full listing details
+# 6. Get full listing details
 curl http://localhost:3002/listings/{listing_id}
 ```
 
 ## Next Steps
 
-1. **Add manifest to BakeBase** - See `BAKEBASE_INTEGRATION.md`
-2. **Deploy to production** - Follow Railway deployment steps above
-3. **Test end-to-end** - Validate BakeBase and submit to registry
-4. **Monitor** - Set up health check monitoring for both services
-5. **Scale** - Configure auto-scaling and load balancing as needed
+1. **Deploy to production** - Follow Railway deployment steps above
+2. **Test end-to-end** - Validate an API and submit to registry
+3. **Monitor** - Set up health check monitoring for both services
+4. **Scale** - Configure auto-scaling and load balancing as needed
 
 ## Getting Help
 
@@ -388,7 +383,7 @@ curl http://localhost:3002/listings/{listing_id}
 - See `spec/v0.1.md` for complete specification
 - Review `validator/README.md` for validator details
 - Check `registry/README.md` for registry API reference
-- Review `BAKEBASE_INTEGRATION.md` for adding manifest to APIs
+- See README for how to add manifests to your API
 
 ## Development Tips
 

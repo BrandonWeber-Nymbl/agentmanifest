@@ -49,8 +49,8 @@ A public, queryable index of verified APIs that agents can use to discover data 
 # Install the validator
 npm install -g @agentmanifest/cli
 
-# Validate an API (BakeBase example)
-amp validate https://bakebase-production.up.railway.app
+# Validate an API
+amp validate https://bakebase.agent-manifest.com
 
 # If your API passes validation, it can be listed in the registry
 ```
@@ -157,7 +157,7 @@ Fix any errors reported by the validator.
 ### Step 3: Submit to the Registry
 
 ```bash
-curl -X POST https://agent-manifest.com/listings/submit \
+curl -X POST https://api.agent-manifest.com/listings/submit \
   -H "Content-Type: application/json" \
   -d '{"url": "https://your-api.com"}'
 ```
@@ -165,7 +165,7 @@ curl -X POST https://agent-manifest.com/listings/submit \
 You'll receive a `submission_id`. Check its status:
 
 ```bash
-curl https://agent-manifest.com/listings/submit/{submission_id}/status
+curl https://api.agent-manifest.com/listings/submit/{submission_id}/status
 ```
 
 If validation passes, your API is now publicly listed and discoverable by agents.
@@ -187,7 +187,7 @@ If validation passes, your API is now publicly listed and discoverable by agents
   /registry
     prisma/
       schema.prisma  ← Database schema
-      seed.ts        ← Seed data (includes BakeBase)
+      seed.ts        ← Seed data
     src/
       index.ts       ← Registry API server
       routes/        ← API routes
@@ -247,18 +247,6 @@ npm run prisma:seed
 # Start registry
 npm run dev  # Runs on port 3002
 ```
-
----
-
-## Reference Implementation
-
-**BakeBase** is the first AgentManifest-compliant API. It's a food science reference covering functional properties of baking ingredients.
-
-- Live URL: `https://bakebase-production.up.railway.app`
-- Manifest: `https://bakebase-production.up.railway.app/.well-known/agent-manifest.json`
-- GitHub: `https://github.com/AMProtocol/BakeBase`
-
-Use it to test validator and registry integration.
 
 ---
 

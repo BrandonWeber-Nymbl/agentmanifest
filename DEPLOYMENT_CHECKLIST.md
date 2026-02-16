@@ -26,8 +26,8 @@ Complete these steps in order:
 
 ## ✅ Step 5: Add Registry Environment Variables
 In `@agentmanifest/registry` → **Variables**, add:
-- `VALIDATOR_URL`: `https://agentmanifestvalidator-production.up.railway.app`
-- `REGISTRY_URL`: `https://agentmanifestregistry-production.up.railway.app`
+- `VALIDATOR_URL`: `https://validator.agent-manifest.com`
+- `REGISTRY_URL`: `https://api.agent-manifest.com`
 - `NODE_ENV`: `production`
 
 ## ✅ Step 6: Wait for Deployment
@@ -37,17 +37,14 @@ Both services will automatically redeploy. Watch the **Deployments** tab for eac
 
 ```bash
 # Test validator
-curl https://agentmanifestvalidator-production.up.railway.app/health
+curl https://validator.agent-manifest.com/health
 
 # Test registry
-curl https://agentmanifestregistry-production.up.railway.app/health
+curl https://api.agent-manifest.com/health
 
 # List categories
-curl https://agentmanifestregistry-production.up.railway.app/categories
+curl https://api.agent-manifest.com/categories
 ```
-
-## ✅ Step 8: Deploy BakeBase Manifest
-Follow instructions in `BAKEBASE_INTEGRATION.md`
 
 ---
 

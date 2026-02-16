@@ -81,11 +81,12 @@ app.get('/', (req: Request, res: Response) => {
       'POST /validate': 'Validate a manifest by URL',
     },
     usage: {
-      cli: 'npm install -g @agentmanifest/cli && amp validate https://api.example.com',
-      api: 'POST /validate with body: {"url": "https://api.example.com"}',
+      cli: 'npm install -g @agentmanifest/cli && amp validate https://bakebase.agent-manifest.com',
+      api: 'POST /validate with body: {"url": "https://bakebase.agent-manifest.com"}',
     },
     links: {
       protocol: 'https://agent-manifest.com',
+      validator: 'https://validator.agent-manifest.com',
       registry: 'https://api.agent-manifest.com',
       github: 'https://github.com/AMProtocol/AMP',
       example: 'https://bakebase.agent-manifest.com',
