@@ -256,7 +256,7 @@ This is an open protocol. We welcome spec proposals, validator improvements, reg
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions, PR guidelines, and how to propose spec changes.
 
-Open an issue or PR at: [github.com/AMProtocol/agentmanifest](https://github.com/AMProtocol/agentmanifest)
+Open an issue or PR at: [github.com/AMProtocol/AMP](https://github.com/AMProtocol/AMP)
 
 ---
 
@@ -269,6 +269,6 @@ Open an issue or PR at: [github.com/AMProtocol/agentmanifest](https://github.com
 
 ## Contact
 
-For questions, issues, or partnership inquiries: [Open an issue](https://github.com/AMProtocol/agentmanifest/issues) or email brandon.weber@nymbl.app
+For questions, issues, or partnership inquiries: [Open an issue](https://github.com/AMProtocol/AMP/issues) or email brandon@agent-manifest.com
 
 **Build for agents. Build for the long run. Build in the open.**

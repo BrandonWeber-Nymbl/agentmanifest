@@ -19,7 +19,7 @@ async function main() {
       pricing_model: 'free',
       auth_required: false,
       maintained_by: 'individual',
-      contact: 'https://github.com/AMProtocol/agentmanifest',
+      contact: 'https://github.com/AMProtocol/AMP',
       manifest: {
         spec_version: 'agentmanifest-0.1',
         name: 'Example API',

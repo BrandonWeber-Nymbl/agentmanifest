@@ -24,7 +24,7 @@ Thanks for your interest in contributing to the Agent Manifest Protocol. This is
 ### Quick Start with Docker
 
 ```bash
-git clone https://github.com/AMProtocol/agentmanifest.git
+git clone https://github.com/AMProtocol/AMP.git
 cd agentmanifest
 docker-compose up -d
 ```
@@ -34,7 +34,7 @@ This starts PostgreSQL, the validator (port 3001), and the registry (port 3002).
 ### Manual Setup
 
 ```bash
-git clone https://github.com/AMProtocol/agentmanifest.git
+git clone https://github.com/AMProtocol/AMP.git
 cd agentmanifest
 npm install
 
@@ -108,4 +108,4 @@ To propose a new category for the controlled vocabulary:
 
 ## Questions?
 
-Open an issue at [github.com/AMProtocol/agentmanifest/issues](https://github.com/AMProtocol/agentmanifest/issues) or email brandon.weber@nymbl.app.
+Open an issue at [github.com/AMProtocol/AMP/issues](https://github.com/AMProtocol/AMP/issues) or email brandon@agent-manifest.com.
