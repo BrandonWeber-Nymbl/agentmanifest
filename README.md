@@ -47,10 +47,10 @@ A public, queryable index of verified APIs that agents can use to discover data 
 
 ```bash
 # Install the validator
-npm install -g @agentmanifest/validator
+npm install -g @agentmanifest/cli
 
 # Validate an API (BakeBase example)
-agentmanifest validate https://bakebase-production.up.railway.app
+amp validate https://bakebase-production.up.railway.app
 
 # If your API passes validation, it can be listed in the registry
 ```
@@ -149,7 +149,7 @@ Make sure:
 ### Step 2: Validate Locally
 
 ```bash
-npx agentmanifest validate https://your-api.com
+npx amp validate https://your-api.com
 ```
 
 Fix any errors reported by the validator.

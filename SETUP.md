@@ -108,7 +108,7 @@ npm run cli -- validate https://api.example.com
 
 # Or install globally
 npm install -g .
-agentmanifest validate https://api.example.com
+amp validate https://api.example.com
 ```
 
 ## Development Workflow

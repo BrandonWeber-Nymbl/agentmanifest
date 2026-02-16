@@ -176,7 +176,7 @@ The original brief defined completion as:
 
 - [x] **Running validator CLI**
   ```bash
-  npx agentmanifest validate https://bakebase.your-url.com
+  npx amp validate https://bakebase.your-url.com
   ```
   ✅ Built and ready - **pending BakeBase manifest**
 

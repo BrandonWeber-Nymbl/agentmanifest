@@ -39,7 +39,6 @@ app.get('/', (req: Request, res: Response) => {
       categories: '/categories',
       submit: '/listings/submit',
       agents: '/agents',
-      spec: '/spec',
       health: '/health',
     },
     meta: {
@@ -165,13 +164,6 @@ app.get('/categories', async (req: Request, res: Response) => {
   }
 });
 
-// GET /spec - Redirect to spec documentation
-app.get('/spec', (req: Request, res: Response) => {
-  res.redirect(
-    'https://github.com/AMProtocol/agentmanifest/blob/main/spec/v0.1.md'
-  );
-});
-
 // Mount listings router
 app.use('/listings', listingsRouter);
 
@@ -191,7 +183,6 @@ app.use((req: Request, res: Response) => {
       'POST /listings/submit': 'Submit API for validation',
       'GET /listings/submit/:id/status': 'Check submission status',
       'GET /categories': 'List categories with counts',
-      'GET /spec': 'View specification documentation',
     },
   });
 });

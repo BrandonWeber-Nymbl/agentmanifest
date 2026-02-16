@@ -48,7 +48,6 @@ See the root `docker-compose.yml` for running the entire stack (validator + regi
 
 - `GET /categories` - Browse available categories with counts
 - `GET /health` - Health check
-- `GET /spec` - View the AgentManifest specification
 
 ### For API Publishers
 

@@ -205,6 +205,6 @@ app.listen(PORT, () => {
 
 1. Add the manifest endpoint to BakeBase
 2. Deploy to Railway
-3. Validate with `npx agentmanifest validate https://bakebase-production.up.railway.app`
+3. Validate with `npx amp validate https://bakebase-production.up.railway.app`
 4. Submit to the registry
 5. Your API is now discoverable by AI agents!

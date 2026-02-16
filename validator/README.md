@@ -14,11 +14,11 @@ npm install @agentmanifest/validator
 
 ```bash
 # Using npx (no installation needed)
-npx agentmanifest validate https://api.example.com
+npx amp validate https://api.example.com
 
 # Or install globally
-npm install -g @agentmanifest/validator
-agentmanifest validate https://api.example.com
+npm install -g @agentmanifest/cli
+amp validate https://api.example.com
 ```
 
 ### As a Library
