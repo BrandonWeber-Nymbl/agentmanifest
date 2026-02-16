@@ -81,7 +81,7 @@ app.get('/', (req: Request, res: Response) => {
       'POST /validate': 'Validate a manifest by URL',
     },
     usage: {
-      cli: 'npm install -g agentmanifest && agentmanifest validate https://api.example.com',
+      cli: 'npm install -g @agentmanifest/cli && amp validate https://api.example.com',
       api: 'POST /validate with body: {"url": "https://api.example.com"}',
     },
     links: {
