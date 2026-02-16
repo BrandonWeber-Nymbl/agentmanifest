@@ -598,6 +598,71 @@ function generateVerificationToken(
   );
 }
 
+export async function validateManifestObject(manifest: ManifestData, sourceUrl: string = 'local-file'): Promise<ValidationResult> {
+  const validatedAt = new Date().toISOString();
+  const checks: ValidationCheck[] = [];
+
+  // Skip reachability check for local validation
+  checks.push({
+    name: 'manifest_source',
+    passed: true,
+    message: 'Validating local manifest file',
+    severity: 'info',
+  });
+
+  // 2. Schema validity
+  checks.push(checkSchemaValidity(manifest));
+
+  // 3. Spec version check
+  checks.push(checkSpecVersion(manifest));
+
+  // 4. Description quality
+  checks.push(...checkDescriptionQuality(manifest));
+
+  // 5. Skip endpoint reachability for local validation (no URL to test)
+  checks.push({
+    name: 'endpoint_reachability',
+    passed: true,
+    message: 'Skipped (local validation - deploy to test endpoints)',
+    severity: 'info',
+  });
+
+  // 6. Pricing consistency
+  checks.push(...checkPricingConsistency(manifest));
+
+  // 7. Category validity
+  checks.push(...checkCategoryValidity(manifest));
+
+  // 8. Authentication consistency
+  checks.push(checkAuthenticationConsistency(manifest));
+
+  // 9. Payment consistency
+  checks.push(...checkPaymentConsistency(manifest));
+
+  // Determine if validation passed (all error-severity checks must pass)
+  const passed = checks.every(
+    (check) => check.passed || check.severity !== 'error'
+  );
+
+  // Generate verification token if passed
+  const verificationToken = passed
+    ? generateVerificationToken(
+        sourceUrl,
+        validatedAt,
+        manifest.spec_version || 'unknown'
+      )
+    : null;
+
+  return {
+    url: sourceUrl,
+    validated_at: validatedAt,
+    passed,
+    spec_version: manifest.spec_version || null,
+    checks,
+    verification_token: verificationToken,
+  };
+}
+
 export async function validateManifest(url: string): Promise<ValidationResult> {
   const validatedAt = new Date().toISOString();
   const checks: ValidationCheck[] = [];

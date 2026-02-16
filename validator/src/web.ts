@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { validateManifest } from './index';
+import { validateManifest, validateManifestObject } from './index';
 import schema from '../spec/schema.json';
 
 const app = express();
@@ -33,23 +33,30 @@ app.get('/spec', (req: Request, res: Response) => {
 // Validate manifest
 app.post('/validate', async (req: Request, res: Response) => {
   try {
-    const { url } = req.body;
+    const { url, manifest } = req.body;
 
-    if (!url) {
+    // Support both URL and direct manifest object
+    if (!url && !manifest) {
       return res.status(400).json({
-        error: 'URL is required',
-        message: 'Request body must include "url" field',
+        error: 'URL or manifest is required',
+        message: 'Request body must include either "url" or "manifest" field',
       });
     }
 
-    if (typeof url !== 'string') {
-      return res.status(400).json({
-        error: 'Invalid URL',
-        message: 'URL must be a string',
-      });
+    let result;
+    if (manifest) {
+      // Validate manifest object directly
+      result = await validateManifestObject(manifest, url || 'local-manifest');
+    } else {
+      // Validate by URL
+      if (typeof url !== 'string') {
+        return res.status(400).json({
+          error: 'Invalid URL',
+          message: 'URL must be a string',
+        });
+      }
+      result = await validateManifest(url);
     }
-
-    const result = await validateManifest(url);
 
     res.json(result);
   } catch (error) {
