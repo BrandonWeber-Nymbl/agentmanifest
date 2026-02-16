@@ -19,7 +19,7 @@ services:
   validator:
     build:
       context: .
-      dockerfile: ./validator/Dockerfile
+      dockerfile: ./Dockerfile.validator
     container_name: agentmanifest-validator
     ports:
       - "3001:3001"
@@ -36,7 +36,7 @@ services:
   registry:
     build:
       context: .
-      dockerfile: ./registry/Dockerfile
+      dockerfile: ./Dockerfile.registry
     container_name: agentmanifest-registry
     ports:
       - "3002:3002"
