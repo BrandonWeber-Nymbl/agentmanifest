@@ -1,6 +1,6 @@
-**AMP — Agent Manifest Protocol**  
-Created by Brandon Weber · February 2026  
-Spec licensed CC BY 4.0 · Code licensed MIT
+**AMP — Agent Manifest Protocol**
+Created by Brandon Weber · February 2026
+Spec licensed CC0 1.0 · Code licensed MIT
 
 # AgentManifest
 
@@ -247,33 +247,6 @@ npm run prisma:seed
 # Start registry
 npm run dev  # Runs on port 3002
 ```
-
----
-
-## The Vision
-
-This is infrastructure for the agent data economy. Where it goes:
-
-**Phase 1 (Current)**: Open protocol, free registry, manual compensation
-- APIs self-declare their capabilities
-- Agents discover data sources at runtime
-- Providers get found, agents stop hallucinating
-- Compensation happens outside the protocol (Stripe links, support URLs, etc.)
-
-**Phase 2**: Clearinghouse settlement
-- The registry becomes a clearinghouse for automated API usage billing
-- Agents pay per query via protocol-level payment rails
-- Providers get paid automatically based on actual usage
-- Transparent pricing, no contracts, no enterprise sales
-
-**Phase 3**: Ecosystem of domain experts
-- Every niche domain has expert-maintained APIs
-- Biologists encode protein folding knowledge
-- Chemists encode reaction prediction
-- Musicians encode music theory
-- The physical world becomes callable by agents
-
-This is how knowledge workers get compensated in the agent economy. Not by being replaced, but by encoding their expertise as queryable, compensable APIs.
 
 ---
 

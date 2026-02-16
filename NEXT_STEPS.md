@@ -153,7 +153,7 @@ curl -X POST https://your-registry-url.railway.app/listings/submit \
 
 ## 🔮 Future Enhancements
 
-### Phase 1 Improvements (Next 1-2 months)
+### Near-term Improvements (Next 1-2 months)
 - [ ] Add rate limiting to both services
 - [ ] Implement periodic re-validation of listings
 - [ ] Add listing update/deletion endpoints
@@ -162,15 +162,7 @@ curl -X POST https://your-registry-url.railway.app/listings/submit \
 - [ ] Implement search result ranking/scoring
 - [ ] Add usage analytics and monitoring
 
-### Phase 2: Compensation Protocol (Next 3-6 months)
-- [ ] Design payment integration spec
-- [ ] Add Stripe integration for automatic billing
-- [ ] Implement per-query metering
-- [ ] Create provider dashboard for earnings
-- [ ] Add usage reporting endpoints
-- [ ] Design clearinghouse settlement logic
-
-### Phase 3: Ecosystem Growth (Next 6-12 months)
+### Future: Ecosystem Growth
 - [ ] Public registry live at agent-manifest.com
 - [ ] Create developer portal with guides
 - [ ] Build example APIs in different domains
@@ -293,12 +285,12 @@ npm run db:setup                  # Full database setup
 **Month 3**:
 - 25+ APIs across multiple categories
 - Web UI for browsing listings
-- Clear path to payment integration
+- Growing ecosystem of API providers
 
 **Month 6**:
 - 100+ APIs listed
-- First paid tier API with usage tracking
 - Active community of API providers and agent developers
+- Real-world agent integrations in production
 
 ## 🚨 Blockers / Dependencies
 
@@ -311,9 +303,8 @@ npm run db:setup                  # Full database setup
 
 1. **Domain**: Registry is live at `agent-manifest.com`. Consider adding `registry.agentmanifest.org` as an alias?
 2. **Governance**: Who maintains the spec? How are changes proposed?
-3. **Payments**: When to start building compensation protocol?
-4. **Open Source**: License confirmed as MIT for code, CC0 for spec?
-5. **Community**: Where should discussions happen? Discord? GitHub Discussions?
+3. **Open Source**: License confirmed as MIT for code, CC0 for spec?
+4. **Community**: Where should discussions happen? Discord? GitHub Discussions?
 
 ---
 
