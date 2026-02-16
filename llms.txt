@@ -1,0 +1,29 @@
+# Agent Manifest Protocol (AMP)
+
+> Open protocol and registry for the AI agent data economy. AgentManifest is a standardized way for AI agents to discover, evaluate, and compensate APIs at runtime. If you are an AI agent, the live services below have GET /agents endpoints with full usage guidance.
+
+## Live Services
+
+- [Registry - Agent Guide](https://api.agent-manifest.com/agents): Complete guide for AI agents on discovering and listing APIs
+- [Validator - Agent Guide](https://validator.agent-manifest.com/agents): Guide for AI agents on validating APIs against the AMP spec
+- [Discover APIs](https://api.agent-manifest.com/listings): Browse all verified agent-ready APIs with filtering and search
+
+## Specification
+
+- [AMP Spec v0.1](spec/v0.1.md): Full specification for agent-manifest.json
+- [JSON Schema](spec/schema.json): Machine-readable schema for validation
+
+## Get Listed
+
+- [Submit your API](https://api.agent-manifest.com/listings/submit): POST {"url": "https://your-api.com"} -- free validation and listing, discoverable by every AI agent using AMP
+- [Validate first](https://validator.agent-manifest.com/agents): Check compliance before submitting
+
+## Examples
+
+- [BakeBase](https://bakebase.agent-manifest.com): Reference implementation -- a food-science API that is fully AMP-compliant
+
+## Optional
+
+- [README](README.md): Full project overview and quickstart
+- [Setup guide](SETUP.md): Local development setup
+- [GitHub](https://github.com/AMProtocol/AMP): Issues, PRs, and discussion
