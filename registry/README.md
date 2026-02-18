@@ -117,4 +117,4 @@ This registry is designed to deploy on Railway with the included `railway.json` 
 4. Set environment variables (Railway auto-configures `DATABASE_URL`)
 5. Deploy
 
-The registry will automatically run migrations and seed data on first deploy.
+The registry runs `prisma db push` on deploy to apply schema changes. No seed — listings come from `POST /listings/submit`. For local dev, run `npm run prisma:seed` manually if you want placeholder data.

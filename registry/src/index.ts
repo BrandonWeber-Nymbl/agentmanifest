@@ -65,7 +65,7 @@ app.get('/health', (req: Request, res: Response) => {
 app.get('/agents', (req: Request, res: Response) => {
   res.json({
     meta: {
-      spec_version: 'agentmanifest-0.1',
+      spec_version: 'agentmanifest-0.2',
       endpoint_description:
         'Human and agent-readable description of the AgentManifest registry and how to use it',
       ai_agent_notice:
@@ -207,7 +207,7 @@ app.get('/categories', async (req: Request, res: Response) => {
 
     res.json({
       meta: {
-        spec_version: 'agentmanifest-0.1',
+        spec_version: 'agentmanifest-0.2',
         endpoint_description:
           'Returns all categories used by verified listings with counts',
         registry_notes:
@@ -234,7 +234,7 @@ app.use('/listings', listingsRouter);
 app.use((req: Request, res: Response) => {
   res.status(404).json({
     meta: {
-      spec_version: 'agentmanifest-0.1',
+      spec_version: 'agentmanifest-0.2',
     },
     error: 'Not found',
     message: 'Endpoint not found',
@@ -258,7 +258,7 @@ app.use((err: Error, req: Request, res: Response, next: Function) => {
   console.error('Server error:', err);
   res.status(500).json({
     meta: {
-      spec_version: 'agentmanifest-0.1',
+      spec_version: 'agentmanifest-0.2',
     },
     error: 'Internal server error',
     message: err.message,

@@ -19,6 +19,7 @@ model Listing {
   maintained_by     String
   contact           String
   manifest          Json
+  validation_result Json?
   verification_token String?
   verified_at       DateTime?
   last_checked_at   DateTime?

@@ -5,7 +5,7 @@
 The complete AgentManifest infrastructure is now ready:
 
 ### 1. **Specification (Complete)**
-- ✅ Human-readable spec document (`spec/v0.1.md`)
+- ✅ Human-readable spec document (`spec/v0.2.md`)
 - ✅ JSON Schema for validation (`spec/schema.json`)
 - ✅ Controlled vocabularies for categories
 - ✅ Eligibility rules and validation criteria
@@ -200,7 +200,7 @@ The original brief defined completion as:
 
 - **`README.md`** - Project overview and quickstart
 - **`SETUP.md`** - Complete installation guide
-- **`spec/v0.1.md`** - Full specification document
+- **`spec/v0.2.md`** - Current specification document
 - **`spec/schema.json`** - JSON Schema for validation
 - **`validator/README.md`** - Validator documentation
 - **`registry/README.md`** - Registry API documentation

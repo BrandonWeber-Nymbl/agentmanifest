@@ -93,10 +93,10 @@ cmds = [
 ]
 
 [start]
-cmd = "npm run prisma:push && npm run prisma:seed && npm start"
+cmd = "npm run prisma:push && npm start"
 ```
 
-The start commands are already defined - Railway will use them automatically once the root directories are set correctly.
+The start command runs `prisma db push` (applies schema changes) then starts the app. **No seed** — production registry is populated via `POST /listings/submit`.
 
 ## Step 5: Verify Deployment
 
@@ -152,6 +152,10 @@ curl https://api.agent-manifest.com/categories
 - `VALIDATOR_URL`: https://validator.agent-manifest.com
 - `REGISTRY_URL`: https://api.agent-manifest.com
 - `NODE_ENV`: production
+
+## Schema Changes on Deploy
+
+`prisma db push` runs on every deploy and applies schema changes (e.g. `validation_result` replacing `badges`). No migration files needed. Existing listings keep working; new submissions get full validation results.
 
 ## Next Steps After Deployment
 

@@ -2,6 +2,8 @@ import Ajv from 'ajv';
 import addFormats from 'ajv-formats';
 import jwt from 'jsonwebtoken';
 import schema from '../spec/schema.json';
+import { validateAuthAndPayment } from './validateAuthAndPayment';
+import { checkAgentOperationalCompleteness } from './checkAgentCompleteness';
 
 const ajv = new Ajv({ allErrors: true, strict: false });
 addFormats(ajv);
@@ -20,6 +22,18 @@ export interface ValidationResult {
   spec_version: string | null;
   checks: ValidationCheck[];
   verification_token: string | null;
+  /** Schema validation passed */
+  schema_valid?: boolean;
+  /** Declared endpoints are reachable */
+  endpoints_reachable?: boolean;
+  /** Auth flow verified (when auth required) */
+  auth_verified?: boolean;
+  /** Payment flow verified (when prepay_required) */
+  payment_flow_verified?: boolean;
+  /** Agent notes contain procedural completeness */
+  operationally_complete?: boolean;
+  /** Informational badges (auth-verified, payment-ready) */
+  badges?: string[];
 }
 
 interface ManifestData {
@@ -214,11 +228,11 @@ function checkSchemaValidity(manifest: ManifestData): ValidationCheck {
 }
 
 function checkSpecVersion(manifest: ManifestData): ValidationCheck {
-  if (manifest.spec_version !== 'agentmanifest-0.1') {
+  if (manifest.spec_version !== 'agentmanifest-0.2') {
     return {
       name: 'spec_version',
       passed: false,
-      message: `Unknown spec version: ${manifest.spec_version}`,
+      message: `Unsupported spec version: ${manifest.spec_version}. Use agentmanifest-0.2.`,
       severity: 'error',
     };
   }
@@ -579,6 +593,32 @@ function checkPaymentConsistency(manifest: ManifestData): ValidationCheck[] {
   return checks;
 }
 
+function computeDerivedFields(
+  checks: ValidationCheck[],
+  authVerified: boolean,
+  paymentFlowVerified: boolean,
+  operationallyComplete: boolean
+): {
+  schema_valid: boolean;
+  endpoints_reachable: boolean;
+  badges: string[];
+} {
+  const schemaCheck = checks.find((c) => c.name === 'schema_validity');
+  const schema_valid = schemaCheck?.passed ?? false;
+
+  const endpointChecks = checks.filter(
+    (c) => c.name === 'endpoint_reachability' || c.name.startsWith('endpoint_')
+  );
+  const endpoints_reachable =
+    endpointChecks.length === 0 || endpointChecks.every((c) => c.passed);
+
+  const badges: string[] = [];
+  if (authVerified) badges.push('auth-verified');
+  if (paymentFlowVerified) badges.push('payment-ready');
+
+  return { schema_valid, endpoints_reachable, badges };
+}
+
 function generateVerificationToken(
   url: string,
   validatedAt: string,
@@ -598,9 +638,20 @@ function generateVerificationToken(
   );
 }
 
+function getBaseUrlForValidation(sourceUrl: string): string | null {
+  if (
+    typeof sourceUrl === 'string' &&
+    (sourceUrl.startsWith('http://') || sourceUrl.startsWith('https://'))
+  ) {
+    return sourceUrl.replace(/\/$/, '');
+  }
+  return null;
+}
+
 export async function validateManifestObject(manifest: ManifestData, sourceUrl: string = 'local-file'): Promise<ValidationResult> {
   const validatedAt = new Date().toISOString();
   const checks: ValidationCheck[] = [];
+  const baseUrl = getBaseUrlForValidation(sourceUrl);
 
   // Skip reachability check for local validation
   checks.push({
@@ -639,6 +690,16 @@ export async function validateManifestObject(manifest: ManifestData, sourceUrl: 
   // 9. Payment consistency
   checks.push(...checkPaymentConsistency(manifest));
 
+  // 10. Agent operational completeness
+  const completenessResult = checkAgentOperationalCompleteness(
+    manifest.agent_notes
+  );
+  checks.push(completenessResult.check);
+
+  // 11. Auth and payment verification
+  const authPaymentResult = await validateAuthAndPayment(manifest, baseUrl);
+  checks.push(...authPaymentResult.checks);
+
   // Determine if validation passed (all error-severity checks must pass)
   const passed = checks.every(
     (check) => check.passed || check.severity !== 'error'
@@ -653,6 +714,13 @@ export async function validateManifestObject(manifest: ManifestData, sourceUrl: 
       )
     : null;
 
+  const { schema_valid, endpoints_reachable, badges } = computeDerivedFields(
+    checks,
+    authPaymentResult.auth_verified,
+    authPaymentResult.payment_flow_verified,
+    completenessResult.operationally_complete
+  );
+
   return {
     url: sourceUrl,
     validated_at: validatedAt,
@@ -660,6 +728,12 @@ export async function validateManifestObject(manifest: ManifestData, sourceUrl: 
     spec_version: manifest.spec_version || null,
     checks,
     verification_token: verificationToken,
+    schema_valid,
+    endpoints_reachable,
+    auth_verified: authPaymentResult.auth_verified,
+    payment_flow_verified: authPaymentResult.payment_flow_verified,
+    operationally_complete: completenessResult.operationally_complete,
+    badges,
   };
 }
 
@@ -714,6 +788,16 @@ export async function validateManifest(url: string): Promise<ValidationResult> {
   // 9. Payment consistency
   checks.push(...checkPaymentConsistency(manifest));
 
+  // 10. Agent operational completeness
+  const completenessResult = checkAgentOperationalCompleteness(
+    manifest.agent_notes
+  );
+  checks.push(completenessResult.check);
+
+  // 11. Auth and payment verification
+  const authPaymentResult = await validateAuthAndPayment(manifest, baseUrl);
+  checks.push(...authPaymentResult.checks);
+
   // Determine if validation passed (all error-severity checks must pass)
   const passed = checks.every(
     (check) => check.passed || check.severity !== 'error'
@@ -728,6 +812,13 @@ export async function validateManifest(url: string): Promise<ValidationResult> {
       )
     : null;
 
+  const { schema_valid, endpoints_reachable, badges } = computeDerivedFields(
+    checks,
+    authPaymentResult.auth_verified,
+    authPaymentResult.payment_flow_verified,
+    completenessResult.operationally_complete
+  );
+
   return {
     url: baseUrl,
     validated_at: validatedAt,
@@ -735,5 +826,11 @@ export async function validateManifest(url: string): Promise<ValidationResult> {
     spec_version: manifest.spec_version || null,
     checks,
     verification_token: verificationToken,
+    schema_valid,
+    endpoints_reachable,
+    auth_verified: authPaymentResult.auth_verified,
+    payment_flow_verified: authPaymentResult.payment_flow_verified,
+    operationally_complete: completenessResult.operationally_complete,
+    badges,
   };
 }

@@ -21,7 +21,7 @@ async function main() {
       maintained_by: 'individual',
       contact: 'https://github.com/AMProtocol/AMP',
       manifest: {
-        spec_version: 'agentmanifest-0.1',
+        spec_version: 'agentmanifest-0.2',
         name: 'Example API',
         version: '1.0.0',
         description: 'Placeholder manifest for local development.',

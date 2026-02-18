@@ -65,7 +65,7 @@ curl http://localhost:3002/listings
 This is a monorepo with npm workspaces:
 
 ```
-/spec          ← Specification (v0.1.md + schema.json) — the canonical copy
+/spec          ← Specification (v0.2.md + schema.json) — the canonical copy
 /validator     ← Validation library + CLI + web API
 /registry      ← Public registry API + database
 ```
@@ -77,7 +77,7 @@ The `spec/` directory at the root is the canonical source for the specification 
 1. **One concern per PR.** Don't mix a spec change with a code refactor.
 2. **Describe the "why."** The PR description should explain what problem you're solving, not just what you changed.
 3. **Test your changes.** Run the validator against a compliant API (`npm run cli -- validate https://bakebase.agent-manifest.com`) and verify the registry endpoints still work.
-4. **Keep the spec stable.** Changes to `spec/v0.1.md` or `spec/schema.json` have downstream effects on every existing manifest. We take spec changes seriously — open an issue to discuss before submitting a PR.
+4. **Keep the spec stable.** Changes to `spec/v0.2.md`, `spec/v0.1.md`, or `spec/schema.json` have downstream effects on every existing manifest. We take spec changes seriously — open an issue to discuss before submitting a PR.
 
 ## Proposing Spec Changes
 
@@ -86,7 +86,7 @@ The spec is versioned and changes go through discussion before merging:
 1. Open an issue with the `spec` label
 2. Describe: what you'd add/change, why it matters, and whether it's backwards-compatible
 3. The community discusses
-4. If accepted, submit a PR against `spec/v0.1.md` and `spec/schema.json`
+4. If accepted, submit a PR against `spec/v0.2.md` and `spec/schema.json`
 
 Backwards-compatible additions (new optional fields, new categories) have a much lower bar than breaking changes.
 

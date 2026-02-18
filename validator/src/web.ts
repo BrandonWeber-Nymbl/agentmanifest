@@ -34,7 +34,7 @@ app.get('/spec', (req: Request, res: Response) => {
 app.get('/agents', (req: Request, res: Response) => {
   res.json({
     meta: {
-      spec_version: 'agentmanifest-0.1',
+      spec_version: 'agentmanifest-0.2',
       endpoint_description:
         'Human and agent-readable description of the AgentManifest Validator and how to use it',
       ai_agent_notice:
@@ -66,6 +66,9 @@ app.get('/agents', (req: Request, res: Response) => {
         'Pricing consistency - verifies pricing model matches tiers',
         'Category validity - confirms categories from controlled vocabulary',
         'Authentication consistency - verifies auth requirements are logical',
+        'Auth verification - verifies auth flow works (api_key, oauth2, bearer)',
+        'Payment flow verification - when prepay_required: verifies checkout and key provisioning endpoints exist',
+        'Agent operational completeness - agent_notes must describe account, auth, pricing',
       ],
       related_services: {
         registry: 'https://api.agent-manifest.com',

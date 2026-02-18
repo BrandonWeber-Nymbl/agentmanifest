@@ -49,3 +49,7 @@ curl https://api.agent-manifest.com/categories
 ---
 
 **Note**: The start commands are already configured in `nixpacks.toml` files - Railway will use them automatically once root directories are set!
+
+---
+
+**See [DEPLOY.md](DEPLOY.md)** for what runs on deploy, schema handling, and the no-seed policy.

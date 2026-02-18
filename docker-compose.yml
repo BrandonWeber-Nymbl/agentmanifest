@@ -60,7 +60,6 @@ services:
       sh -c "
         npm run prisma:generate &&
         npm run prisma:push &&
-        npm run prisma:seed &&
         npm start
       "
 

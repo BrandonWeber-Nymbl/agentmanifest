@@ -1,4 +1,4 @@
-import { PrismaClient, Listing } from '@prisma/client';
+import { PrismaClient, Listing, Prisma } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -63,6 +63,17 @@ export async function getListingByUrl(url: string): Promise<Listing | null> {
   });
 }
 
+/** Validation result shape from validator (stateless compute layer) */
+export interface StoredValidationResult {
+  schema_valid?: boolean;
+  endpoints_reachable?: boolean;
+  auth_verified?: boolean;
+  payment_flow_verified?: boolean;
+  operationally_complete?: boolean;
+  badges?: string[];
+  [key: string]: unknown;
+}
+
 export async function createListing(data: {
   name: string;
   url: string;
@@ -74,13 +85,16 @@ export async function createListing(data: {
   maintained_by: string;
   contact: string;
   manifest: any;
+  validation_result?: StoredValidationResult | null;
   verification_token?: string;
   check_status?: string;
   failure_reason?: string;
 }): Promise<Listing> {
+  const { validation_result, ...rest } = data;
   return prisma.listing.create({
     data: {
-      ...data,
+      ...rest,
+      validation_result: (validation_result ?? undefined) as Prisma.InputJsonValue | undefined,
       verified_at: data.check_status === 'verified' ? new Date() : null,
       last_checked_at: new Date(),
     },

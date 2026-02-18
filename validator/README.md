@@ -2,6 +2,8 @@
 
 Validator for the AgentManifest specification. Can be used as a library, CLI tool, or web API.
 
+**Architecture**: The validator is **stateless** — it stores nothing, keeps no memory, and never calls the registry. It is a pure compute layer. The registry calls the validator and persists results. See [ARCHITECTURE.md](../ARCHITECTURE.md) for the full separation of concerns.
+
 ## Installation
 
 ```bash

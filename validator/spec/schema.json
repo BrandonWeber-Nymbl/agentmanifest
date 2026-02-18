@@ -23,7 +23,7 @@
   "properties": {
     "spec_version": {
       "type": "string",
-      "enum": ["agentmanifest-0.1"],
+      "enum": ["agentmanifest-0.2"],
       "description": "Version of the AgentManifest specification"
     },
     "name": {

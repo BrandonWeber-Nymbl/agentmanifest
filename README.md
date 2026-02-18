@@ -65,7 +65,7 @@ Every compliant API must serve this at `/.well-known/agent-manifest.json`:
 
 ```json
 {
-  "spec_version": "agentmanifest-0.1",
+  "spec_version": "agentmanifest-0.2",
   "name": "Your API Name",
   "version": "1.0.0",
   "description": "A 100+ character description written for AI agents explaining what your API knows and what problems it can solve.",
@@ -106,7 +106,7 @@ Every compliant API must serve this at `/.well-known/agent-manifest.json`:
 }
 ```
 
-See [spec/v0.1.md](spec/v0.1.md) for complete field documentation.
+See [spec/v0.2.md](spec/v0.2.md) for complete field documentation.
 
 ---
 
@@ -177,7 +177,7 @@ If validation passes, your API is now publicly listed and discoverable by agents
 ```
 /agentmanifest
   /spec
-    v0.1.md          ← Human-readable spec document
+    v0.2.md          ← Specification
     schema.json      ← JSON Schema for validation
   /validator
     src/

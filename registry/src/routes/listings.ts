@@ -2,6 +2,14 @@ import { Router, Request, Response } from 'express';
 import * as listingService from '../services/listing';
 import * as validatorService from '../services/validator';
 
+/** Extract badges from stored validation result. Registry computes display values from raw result. */
+function badgesFromValidationResult(vr: unknown): string[] {
+  if (vr && typeof vr === 'object' && 'badges' in vr && Array.isArray((vr as any).badges)) {
+    return (vr as any).badges;
+  }
+  return [];
+}
+
 const router = Router();
 
 // Store submission statuses in memory (in production, use database or Redis)
@@ -37,7 +45,7 @@ router.get('/', async (req: Request, res: Response) => {
 
     res.json({
       meta: {
-        spec_version: 'agentmanifest-0.1',
+        spec_version: 'agentmanifest-0.2',
         endpoint_description:
           'Returns all verified APIs in the AgentManifest registry. Use query parameters to filter by category, pricing model, authentication requirements, or search terms.',
         registry_notes:
@@ -55,6 +63,7 @@ router.get('/', async (req: Request, res: Response) => {
           pricing_model: listing.pricing_model,
           auth_required: listing.auth_required,
           maintained_by: listing.maintained_by,
+          badges: badgesFromValidationResult(listing.validation_result),
           verified_at: listing.verified_at,
           last_checked_at: listing.last_checked_at,
         })),
@@ -64,7 +73,7 @@ router.get('/', async (req: Request, res: Response) => {
     console.error('Error fetching listings:', error);
     res.status(500).json({
       meta: {
-        spec_version: 'agentmanifest-0.1',
+        spec_version: 'agentmanifest-0.2',
         endpoint_description: 'Error occurred',
       },
       error: 'Internal server error',
@@ -82,7 +91,7 @@ router.get('/:id', async (req: Request, res: Response) => {
     if (!listing) {
       return res.status(404).json({
         meta: {
-          spec_version: 'agentmanifest-0.1',
+          spec_version: 'agentmanifest-0.2',
           endpoint_description: 'Listing not found',
         },
         error: 'Not found',
@@ -92,7 +101,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 
     res.json({
       meta: {
-        spec_version: 'agentmanifest-0.1',
+        spec_version: 'agentmanifest-0.2',
         endpoint_description:
           'Returns full details for a specific API listing including the complete stored manifest.',
       },
@@ -108,6 +117,7 @@ router.get('/:id', async (req: Request, res: Response) => {
         maintained_by: listing.maintained_by,
         contact: listing.contact,
         manifest: listing.manifest,
+        badges: badgesFromValidationResult(listing.validation_result),
         check_status: listing.check_status,
         verified_at: listing.verified_at,
         last_checked_at: listing.last_checked_at,
@@ -119,7 +129,7 @@ router.get('/:id', async (req: Request, res: Response) => {
     console.error('Error fetching listing:', error);
     res.status(500).json({
       meta: {
-        spec_version: 'agentmanifest-0.1',
+        spec_version: 'agentmanifest-0.2',
         endpoint_description: 'Error occurred',
       },
       error: 'Internal server error',
@@ -168,7 +178,7 @@ router.post('/submit', async (req: Request, res: Response) => {
 
     res.status(202).json({
       meta: {
-        spec_version: 'agentmanifest-0.1',
+        spec_version: 'agentmanifest-0.2',
         endpoint_description:
           'Submission accepted. Validation is running asynchronously.',
       },
@@ -204,7 +214,7 @@ router.get('/submit/:id/status', async (req: Request, res: Response) => {
 
     const response: any = {
       meta: {
-        spec_version: 'agentmanifest-0.1',
+        spec_version: 'agentmanifest-0.2',
         endpoint_description: 'Returns the current status of a submission',
       },
       data: {
@@ -270,6 +280,7 @@ async function processSubmission(submissionId: string, url: string) {
       maintained_by: manifest.reliability.maintained_by,
       contact: manifest.contact,
       manifest,
+      validation_result: validationResult as any,
       verification_token: validationResult.verification_token || undefined,
       check_status: 'verified',
     });

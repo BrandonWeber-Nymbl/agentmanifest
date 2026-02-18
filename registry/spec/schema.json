@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://agent-manifest.com/schemas/v0.1/manifest.json",
   "title": "Agent Manifest",
-  "description": "Schema for AgentManifest v0.1 specification",
+  "description": "Schema for AgentManifest v0.2 specification",
   "type": "object",
   "required": [
     "spec_version",
@@ -23,7 +23,7 @@
   "properties": {
     "spec_version": {
       "type": "string",
-      "enum": ["agentmanifest-0.1"],
+      "enum": ["agentmanifest-0.2"],
       "description": "Version of the AgentManifest specification"
     },
     "name": {

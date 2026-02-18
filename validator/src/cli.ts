@@ -21,7 +21,7 @@ function printBanner() {
     colorize('\n╔═══════════════════════════════════════════╗', 'cyan')
   );
   console.log(
-    colorize('║   AgentManifest Validator v0.1          ║', 'cyan')
+    colorize('║   AgentManifest Validator v0.2          ║', 'cyan')
   );
   console.log(
     colorize('╚═══════════════════════════════════════════╝\n', 'cyan')

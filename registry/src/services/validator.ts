@@ -14,6 +14,12 @@ interface ValidationResult {
     severity: 'error' | 'warning' | 'info';
   }>;
   verification_token: string | null;
+  schema_valid?: boolean;
+  endpoints_reachable?: boolean;
+  auth_verified?: boolean;
+  payment_flow_verified?: boolean;
+  operationally_complete?: boolean;
+  badges?: string[];
 }
 
 export async function validateAPI(url: string): Promise<ValidationResult> {

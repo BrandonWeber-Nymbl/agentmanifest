@@ -10,7 +10,7 @@
 
 ## Specification
 
-- [AMP Spec v0.1](spec/v0.1.md): Full specification for agent-manifest.json
+- [AMP Spec v0.2](spec/v0.2.md): Specification for agent-manifest.json
 - [JSON Schema](spec/schema.json): Machine-readable schema for validation
 
 ## Get Listed
