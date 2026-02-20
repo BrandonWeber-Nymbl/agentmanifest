@@ -13,7 +13,7 @@
     "cli": "tsx src/cli.ts",
     "start": "node dist/web.js",
     "start:web": "node dist/web.js",
-    "test": "echo \"Add tests\" && exit 0"
+    "test": "vitest run"
   },
   "keywords": [
     "agentmanifest",
@@ -34,6 +34,7 @@
     "@types/jsonwebtoken": "^9.0.5",
     "@types/node": "^20.10.6",
     "tsx": "^4.7.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vitest": "^4.0.18"
   }
 }

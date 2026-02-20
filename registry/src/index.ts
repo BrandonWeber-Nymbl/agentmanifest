@@ -65,7 +65,7 @@ app.get('/health', (req: Request, res: Response) => {
 app.get('/agents', (req: Request, res: Response) => {
   res.json({
     meta: {
-      spec_version: 'agentmanifest-0.2',
+      spec_version: 'agentmanifest-0.3',
       endpoint_description:
         'Human and agent-readable description of the AgentManifest registry and how to use it',
       ai_agent_notice:
@@ -91,10 +91,26 @@ app.get('/agents', (req: Request, res: Response) => {
           'GET /listings?primary_category=reference - Find APIs by their primary type (reference, computational, live, etc.)',
         filter_by_pricing:
           'GET /listings?pricing_model=free - Find free APIs',
+        filter_by_payment_model:
+          'GET /listings?payment_model=per_request - v0.3: Filter by payment model (per_request, metered_usage, prepaid_credits, subscription)',
+        filter_by_currency:
+          'GET /listings?payment_currency=USD - v0.3: Filter by payment currency',
+        filter_by_settlement:
+          'GET /listings?settlement_type=real_time - v0.3: real_time, postpaid_cycle, prepaid_debit',
+        filter_by_spend_cap:
+          'GET /listings?supports_spend_cap=true - v0.3: APIs with budget spend cap support',
+        filter_by_free:
+          'GET /listings?free_only=true - Free APIs only',
         filter_by_auth:
           'GET /listings?auth_required=false - Find APIs that do not require authentication',
+        filter_by_maintainer:
+          'GET /listings?maintained_by=organization - individual, organization, community',
+        filter_by_badges:
+          'GET /listings?badges=auth-verified,payment-ready - Filter by verification badges',
         search:
           'GET /listings?q=ingredients - Fuzzy search across API names and descriptions',
+        sort_and_paginate:
+          'GET /listings?sort=name&limit=20&offset=0 - Sort by name, created_at, or verified_at; paginate with limit (max 500) and offset',
         get_details:
           'GET /listings/{id} - Get full details including the complete manifest for a specific API',
       },
@@ -105,11 +121,16 @@ app.get('/agents', (req: Request, res: Response) => {
         'music-gear',
         'chemistry',
         'biology',
+        'physics',
+        'mathematics',
         'geography',
         'finance',
         'legal',
         'medical',
         'engineering',
+        'education',
+        'translation',
+        'media',
         'agriculture',
         'computing',
         'language',
@@ -181,9 +202,15 @@ app.get('/llms.txt', (req: Request, res: Response) => {
 
 ## Filter and Browse
 
-- [By category](/listings?category=food-science): 20+ domain categories (food-science, finance, medical, engineering, etc.)
+- [By category](/listings?category=food-science): 25+ domain categories (food-science, finance, medical, engineering, physics, translation, etc.)
 - [By type](/listings?primary_category=reference): reference, live, computational, transactional, enrichment, personal, discovery
 - [Free APIs](/listings?pricing_model=free): Find APIs with no cost
+- [Free only](/listings?free_only=true): Free APIs only
+- [By payment model](/listings?payment_model=per_request): v0.3: per_request, metered_usage, prepaid_credits, subscription
+- [By currency](/listings?payment_currency=USD): v0.3: Filter by payment currency
+- [By settlement](/listings?settlement_type=real_time): v0.3: real_time, postpaid_cycle, prepaid_debit
+- [Spend cap support](/listings?supports_spend_cap=true): v0.3: APIs with budget spend cap
+- [By badges](/listings?badges=auth-verified,payment-ready): auth-verified, payment-ready, budget-aware
 - [No-auth APIs](/listings?auth_required=false): Find APIs requiring no authentication
 
 ## Examples
@@ -207,7 +234,7 @@ app.get('/categories', async (req: Request, res: Response) => {
 
     res.json({
       meta: {
-        spec_version: 'agentmanifest-0.2',
+        spec_version: 'agentmanifest-0.3',
         endpoint_description:
           'Returns all categories used by verified listings with counts',
         registry_notes:
@@ -234,7 +261,7 @@ app.use('/listings', listingsRouter);
 app.use((req: Request, res: Response) => {
   res.status(404).json({
     meta: {
-      spec_version: 'agentmanifest-0.2',
+      spec_version: 'agentmanifest-0.3',
     },
     error: 'Not found',
     message: 'Endpoint not found',
@@ -258,19 +285,21 @@ app.use((err: Error, req: Request, res: Response, next: Function) => {
   console.error('Server error:', err);
   res.status(500).json({
     meta: {
-      spec_version: 'agentmanifest-0.2',
+      spec_version: 'agentmanifest-0.3',
     },
     error: 'Internal server error',
     message: err.message,
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`AgentManifest Registry running on port ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
-  console.log(`For agents: http://localhost:${PORT}/agents`);
-  console.log(`LLM discovery: http://localhost:${PORT}/llms.txt`);
-  console.log(`Listings: http://localhost:${PORT}/listings`);
-});
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, () => {
+    console.log(`AgentManifest Registry running on port ${PORT}`);
+    console.log(`Health check: http://localhost:${PORT}/health`);
+    console.log(`For agents: http://localhost:${PORT}/agents`);
+    console.log(`LLM discovery: http://localhost:${PORT}/llms.txt`);
+    console.log(`Listings: http://localhost:${PORT}/listings`);
+  });
+}
 
 export default app;

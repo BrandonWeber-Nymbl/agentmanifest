@@ -56,12 +56,58 @@ interface ManifestData {
     paid_tier?: any;
     support_url?: string;
   };
-  payment?: {
+  payment?: null | {
+    // v0.2 fields (legacy)
     provider?: string;
     checkout_url?: string;
     key_provisioning_url?: string;
     accepted_methods?: string[];
     prepay_required?: boolean;
+    // v0.3 fields
+    model?: string;
+    currency?: string;
+    rates?: Array<{
+      unit: string;
+      price: string;
+      description?: string;
+      tier?: string | null;
+      threshold?: number | null;
+      cap?: number | null;
+    }>;
+    onboarding?: {
+      url: string;
+      method: string;
+      accepts: string[];
+      returns: {
+        credential_type: string;
+        credential_field: string;
+        instructions: string;
+        expires_in?: number | null;
+        refresh_url?: string | null;
+      };
+    };
+    usage_endpoint?: {
+      url: string;
+      method: string;
+      authentication: string;
+    };
+    settlement?: {
+      type: string;
+      cycle?: string | null;
+      provider_name?: string | null;
+      provider_url?: string | null;
+    };
+    budget_controls?: {
+      supports_spend_cap?: boolean;
+      supports_per_request_limit?: boolean;
+      supports_rate_limit?: boolean;
+      supports_alerting?: boolean;
+    };
+    refund_policy?: {
+      type: string;
+      terms_url?: string | null;
+      window_seconds?: number | null;
+    };
   };
   authentication?: {
     required: boolean;
@@ -95,11 +141,16 @@ const VALID_CATEGORIES = [
   'music-gear',
   'chemistry',
   'biology',
+  'physics',
+  'mathematics',
   'geography',
   'finance',
   'legal',
   'medical',
   'engineering',
+  'education',
+  'translation',
+  'media',
   'agriculture',
   'computing',
   'language',
@@ -227,12 +278,14 @@ function checkSchemaValidity(manifest: ManifestData): ValidationCheck {
   };
 }
 
+const SUPPORTED_SPEC_VERSIONS = ['agentmanifest-0.2', 'agentmanifest-0.3'];
+
 function checkSpecVersion(manifest: ManifestData): ValidationCheck {
-  if (manifest.spec_version !== 'agentmanifest-0.2') {
+  if (!manifest.spec_version || !SUPPORTED_SPEC_VERSIONS.includes(manifest.spec_version)) {
     return {
       name: 'spec_version',
       passed: false,
-      message: `Unsupported spec version: ${manifest.spec_version}. Use agentmanifest-0.2.`,
+      message: `Unsupported spec version: ${manifest.spec_version}. Use agentmanifest-0.2 or agentmanifest-0.3.`,
       severity: 'error',
     };
   }
@@ -240,9 +293,13 @@ function checkSpecVersion(manifest: ManifestData): ValidationCheck {
   return {
     name: 'spec_version',
     passed: true,
-    message: 'Valid spec version declared',
+    message: `Valid spec version declared (${manifest.spec_version})`,
     severity: 'info',
   };
+}
+
+function isV03(manifest: ManifestData): boolean {
+  return manifest.spec_version === 'agentmanifest-0.3';
 }
 
 function checkDescriptionQuality(manifest: ManifestData): ValidationCheck[] {
@@ -272,12 +329,13 @@ function checkDescriptionQuality(manifest: ManifestData): ValidationCheck[] {
     });
   }
 
-  // Agent notes length
-  if (!manifest.agent_notes || manifest.agent_notes.length < 50) {
+  // Agent notes length — v0.3 requires 150 chars, v0.2 requires 50
+  const agentNotesMin = isV03(manifest) ? 150 : 50;
+  if (!manifest.agent_notes || manifest.agent_notes.length < agentNotesMin) {
     checks.push({
       name: 'agent_notes_length',
       passed: false,
-      message: `Agent notes too short (${manifest.agent_notes?.length || 0} chars, minimum 50)`,
+      message: `Agent notes too short (${manifest.agent_notes?.length || 0} chars, minimum ${agentNotesMin})`,
       severity: 'error',
     });
   } else if (isBoilerplate(manifest.agent_notes)) {
@@ -534,15 +592,24 @@ function checkAuthenticationConsistency(manifest: ManifestData): ValidationCheck
   };
 }
 
+const VALID_PAYMENT_MODELS = ['free', 'per_request', 'metered_usage', 'prepaid_credits', 'subscription'];
+const VALID_SETTLEMENT_TYPES = ['real_time', 'postpaid_cycle', 'prepaid_debit'];
+const DECIMAL_PATTERN = /^\d+(\.\d+)?$/;
+
 function checkPaymentConsistency(manifest: ManifestData): ValidationCheck[] {
   const checks: ValidationCheck[] = [];
 
-  // Payment field is optional, so if not present, that's fine
+  // Payment field is optional — null or absent is fine
   if (!manifest.payment) {
     return checks;
   }
 
-  // If payment is present, checkout_url is required
+  // Detect v0.3 payment object (has model/currency/rates) vs v0.2 legacy (has checkout_url/prepay_required)
+  if (isV03(manifest) && manifest.payment.model) {
+    return checkV03PaymentConsistency(manifest);
+  }
+
+  // v0.2 legacy payment checks
   if (!manifest.payment.checkout_url) {
     checks.push({
       name: 'payment_checkout_url',
@@ -551,7 +618,6 @@ function checkPaymentConsistency(manifest: ManifestData): ValidationCheck[] {
       severity: 'error',
     });
   } else {
-    // Validate checkout_url is a valid URL
     try {
       new URL(manifest.payment.checkout_url);
       checks.push({
@@ -570,7 +636,6 @@ function checkPaymentConsistency(manifest: ManifestData): ValidationCheck[] {
     }
   }
 
-  // Validate key_provisioning_url if present
   if (manifest.payment.key_provisioning_url) {
     try {
       new URL(manifest.payment.key_provisioning_url);
@@ -593,11 +658,269 @@ function checkPaymentConsistency(manifest: ManifestData): ValidationCheck[] {
   return checks;
 }
 
+/**
+ * v0.3 payment block validation (§18.2 checks 13–22)
+ */
+function checkV03PaymentConsistency(manifest: ManifestData): ValidationCheck[] {
+  const checks: ValidationCheck[] = [];
+  const payment = manifest.payment!;
+
+  // Check 13: payment.model is recognized
+  if (!payment.model || !VALID_PAYMENT_MODELS.includes(payment.model)) {
+    checks.push({
+      name: 'payment_model',
+      passed: false,
+      message: `Unrecognized payment model: "${payment.model}". Expected one of: ${VALID_PAYMENT_MODELS.join(', ')}`,
+      severity: 'error',
+    });
+  } else {
+    checks.push({
+      name: 'payment_model',
+      passed: true,
+      message: `Valid payment model: ${payment.model}`,
+      severity: 'info',
+    });
+  }
+
+  // Check 14: payment.currency is valid ISO 4217 or x- prefixed
+  if (!payment.currency) {
+    checks.push({
+      name: 'payment_currency',
+      passed: false,
+      message: 'payment.currency is required',
+      severity: 'error',
+    });
+  } else {
+    const isIso4217 = /^[A-Z]{3}$/.test(payment.currency);
+    const isCustom = /^x-/.test(payment.currency);
+    if (!isIso4217 && !isCustom) {
+      checks.push({
+        name: 'payment_currency',
+        passed: false,
+        message: `payment.currency "${payment.currency}" is not a valid ISO 4217 code or x- prefixed identifier`,
+        severity: 'warning',
+      });
+    } else {
+      checks.push({
+        name: 'payment_currency',
+        passed: true,
+        message: `Valid payment currency: ${payment.currency}`,
+        severity: 'info',
+      });
+    }
+  }
+
+  // Check 15: rates has at least one entry (unless model is free)
+  if (payment.model !== 'free') {
+    if (!payment.rates || payment.rates.length === 0) {
+      checks.push({
+        name: 'payment_rates',
+        passed: false,
+        message: 'payment.rates must contain at least one entry for non-free payment models',
+        severity: 'error',
+      });
+    } else {
+      checks.push({
+        name: 'payment_rates',
+        passed: true,
+        message: `${payment.rates.length} rate(s) defined`,
+        severity: 'info',
+      });
+    }
+  }
+
+  // Check 16: all rates[].price values are valid decimal strings
+  if (payment.rates && payment.rates.length > 0) {
+    const invalidPrices = payment.rates.filter(r => !DECIMAL_PATTERN.test(r.price));
+    if (invalidPrices.length > 0) {
+      checks.push({
+        name: 'payment_rates_price_format',
+        passed: false,
+        message: `Invalid price format in rates: ${invalidPrices.map(r => `"${r.price}" for unit "${r.unit}"`).join(', ')}. Prices must be decimal strings (e.g., "0.001").`,
+        severity: 'error',
+      });
+    } else {
+      checks.push({
+        name: 'payment_rates_price_format',
+        passed: true,
+        message: 'All rate prices are valid decimal strings',
+        severity: 'info',
+      });
+    }
+  }
+
+  // Check 17–19: onboarding (required when model is not free)
+  if (payment.model !== 'free') {
+    if (!payment.onboarding) {
+      checks.push({
+        name: 'payment_onboarding',
+        passed: false,
+        message: 'payment.onboarding is required for non-free payment models',
+        severity: 'error',
+      });
+    } else {
+      // Check 17: onboarding.url is a valid URL
+      if (!payment.onboarding.url) {
+        checks.push({
+          name: 'payment_onboarding_url',
+          passed: false,
+          message: 'payment.onboarding.url is required',
+          severity: 'error',
+        });
+      } else {
+        try {
+          new URL(payment.onboarding.url);
+          checks.push({
+            name: 'payment_onboarding_url',
+            passed: true,
+            message: 'payment.onboarding.url is a valid URL',
+            severity: 'info',
+          });
+        } catch {
+          checks.push({
+            name: 'payment_onboarding_url',
+            passed: false,
+            message: 'payment.onboarding.url is not a valid URL',
+            severity: 'error',
+          });
+        }
+      }
+
+      // Check 18: onboarding.accepts has at least one value
+      if (!payment.onboarding.accepts || payment.onboarding.accepts.length === 0) {
+        checks.push({
+          name: 'payment_onboarding_accepts',
+          passed: false,
+          message: 'payment.onboarding.accepts must contain at least one credential type',
+          severity: 'error',
+        });
+      } else {
+        checks.push({
+          name: 'payment_onboarding_accepts',
+          passed: true,
+          message: `Onboarding accepts: ${payment.onboarding.accepts.join(', ')}`,
+          severity: 'info',
+        });
+      }
+
+      // Check 19: onboarding.returns has required fields
+      if (!payment.onboarding.returns) {
+        checks.push({
+          name: 'payment_onboarding_returns',
+          passed: false,
+          message: 'payment.onboarding.returns is required',
+          severity: 'error',
+        });
+      } else {
+        const ret = payment.onboarding.returns;
+        const missingFields = [];
+        if (!ret.credential_type) missingFields.push('credential_type');
+        if (!ret.credential_field) missingFields.push('credential_field');
+        if (!ret.instructions) missingFields.push('instructions');
+
+        if (missingFields.length > 0) {
+          checks.push({
+            name: 'payment_onboarding_returns',
+            passed: false,
+            message: `payment.onboarding.returns missing required fields: ${missingFields.join(', ')}`,
+            severity: 'error',
+          });
+        } else {
+          checks.push({
+            name: 'payment_onboarding_returns',
+            passed: true,
+            message: 'payment.onboarding.returns has all required fields',
+            severity: 'info',
+          });
+        }
+      }
+    }
+  }
+
+  // Check 20: settlement.type is recognized
+  if (!payment.settlement) {
+    checks.push({
+      name: 'payment_settlement',
+      passed: false,
+      message: 'payment.settlement is required',
+      severity: 'error',
+    });
+  } else {
+    if (!VALID_SETTLEMENT_TYPES.includes(payment.settlement.type)) {
+      checks.push({
+        name: 'payment_settlement_type',
+        passed: false,
+        message: `Unrecognized settlement type: "${payment.settlement.type}". Expected one of: ${VALID_SETTLEMENT_TYPES.join(', ')}`,
+        severity: 'error',
+      });
+    } else {
+      checks.push({
+        name: 'payment_settlement_type',
+        passed: true,
+        message: `Valid settlement type: ${payment.settlement.type}`,
+        severity: 'info',
+      });
+    }
+
+    // Check 21: if postpaid_cycle, cycle must be non-null
+    if (payment.settlement.type === 'postpaid_cycle' && !payment.settlement.cycle) {
+      checks.push({
+        name: 'payment_settlement_cycle',
+        passed: false,
+        message: 'settlement.cycle is required when settlement.type is "postpaid_cycle"',
+        severity: 'error',
+      });
+    }
+  }
+
+  // Check 22: usage_endpoint URL is valid if present
+  if (payment.usage_endpoint) {
+    if (!payment.usage_endpoint.url) {
+      checks.push({
+        name: 'payment_usage_endpoint',
+        passed: false,
+        message: 'payment.usage_endpoint.url is required when usage_endpoint is declared',
+        severity: 'error',
+      });
+    } else {
+      try {
+        new URL(payment.usage_endpoint.url);
+        checks.push({
+          name: 'payment_usage_endpoint',
+          passed: true,
+          message: 'payment.usage_endpoint.url is a valid URL',
+          severity: 'info',
+        });
+      } catch {
+        checks.push({
+          name: 'payment_usage_endpoint',
+          passed: false,
+          message: 'payment.usage_endpoint.url is not a valid URL',
+          severity: 'error',
+        });
+      }
+    }
+  }
+
+  // Summary
+  if (checks.every(c => c.passed)) {
+    checks.push({
+      name: 'payment_consistency',
+      passed: true,
+      message: 'v0.3 payment configuration is consistent',
+      severity: 'info',
+    });
+  }
+
+  return checks;
+}
+
 function computeDerivedFields(
   checks: ValidationCheck[],
   authVerified: boolean,
   paymentFlowVerified: boolean,
-  operationallyComplete: boolean
+  operationallyComplete: boolean,
+  budgetAware: boolean = false
 ): {
   schema_valid: boolean;
   endpoints_reachable: boolean;
@@ -615,6 +938,7 @@ function computeDerivedFields(
   const badges: string[] = [];
   if (authVerified) badges.push('auth-verified');
   if (paymentFlowVerified) badges.push('payment-ready');
+  if (budgetAware) badges.push('budget-aware');
 
   return { schema_valid, endpoints_reachable, badges };
 }
@@ -691,8 +1015,11 @@ export async function validateManifestObject(manifest: ManifestData, sourceUrl: 
   checks.push(...checkPaymentConsistency(manifest));
 
   // 10. Agent operational completeness
+  const hasV03Payment = isV03(manifest) && !!manifest.payment?.model && manifest.payment.model !== 'free';
   const completenessResult = checkAgentOperationalCompleteness(
-    manifest.agent_notes
+    manifest.agent_notes,
+    hasV03Payment,
+    isV03(manifest)
   );
   checks.push(completenessResult.check);
 
@@ -714,11 +1041,15 @@ export async function validateManifestObject(manifest: ManifestData, sourceUrl: 
       )
     : null;
 
+  const budgetAware = isV03(manifest) && !!manifest.payment?.budget_controls &&
+    (manifest.payment.budget_controls.supports_spend_cap === true ||
+     manifest.payment.budget_controls.supports_per_request_limit === true);
   const { schema_valid, endpoints_reachable, badges } = computeDerivedFields(
     checks,
     authPaymentResult.auth_verified,
     authPaymentResult.payment_flow_verified,
-    completenessResult.operationally_complete
+    completenessResult.operationally_complete,
+    budgetAware
   );
 
   return {
@@ -789,8 +1120,11 @@ export async function validateManifest(url: string): Promise<ValidationResult> {
   checks.push(...checkPaymentConsistency(manifest));
 
   // 10. Agent operational completeness
+  const hasV03Payment = isV03(manifest) && !!manifest.payment?.model && manifest.payment.model !== 'free';
   const completenessResult = checkAgentOperationalCompleteness(
-    manifest.agent_notes
+    manifest.agent_notes,
+    hasV03Payment,
+    isV03(manifest)
   );
   checks.push(completenessResult.check);
 
@@ -812,11 +1146,15 @@ export async function validateManifest(url: string): Promise<ValidationResult> {
       )
     : null;
 
+  const budgetAware = isV03(manifest) && !!manifest.payment?.budget_controls &&
+    (manifest.payment.budget_controls.supports_spend_cap === true ||
+     manifest.payment.budget_controls.supports_per_request_limit === true);
   const { schema_valid, endpoints_reachable, badges } = computeDerivedFields(
     checks,
     authPaymentResult.auth_verified,
     authPaymentResult.payment_flow_verified,
-    completenessResult.operationally_complete
+    completenessResult.operationally_complete,
+    budgetAware
   );
 
   return {

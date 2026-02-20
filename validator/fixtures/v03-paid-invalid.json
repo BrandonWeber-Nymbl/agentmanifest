@@ -1,0 +1,29 @@
+{
+  "spec_version": "agentmanifest-0.3",
+  "name": "Broken Paid API",
+  "version": "1.0.0",
+  "description": "This manifest has a paid payment model but is missing the required onboarding block. It should fail schema validation for v0.3 paid APIs. Used for testing validation error handling.",
+  "categories": ["other"],
+  "primary_category": "reference",
+  "endpoints": [
+    {
+      "path": "/test",
+      "method": "GET",
+      "description": "Test endpoint for validation purposes.",
+      "parameters": [],
+      "response_description": "Returns a simple response."
+    }
+  ],
+  "authentication": {"required": false, "type": "none"},
+  "pricing": {"model": "usage_based", "free_tier": null, "paid_tier": {"amount_usd": 0.01, "unit": "request", "description": "Per request."}},
+  "payment": {
+    "model": "per_request",
+    "currency": "USD",
+    "rates": [{"unit": "request", "price": "0.01"}],
+    "settlement": {"type": "real_time", "cycle": null}
+  },
+  "agent_notes": "This is a test manifest with payment but no onboarding. No account required. Authentication is none. Pricing is per-request. Used for testing validation.",
+  "contact": "test@example.com",
+  "listing_requested": false,
+  "last_updated": "2026-02-19T00:00:00Z"
+}

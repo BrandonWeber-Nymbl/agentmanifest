@@ -1,0 +1,33 @@
+{
+  "spec_version": "agentmanifest-0.2",
+  "name": "Test API",
+  "version": "1.0.0",
+  "description": "This is a test API manifest for validation testing. It demonstrates the minimum required fields and proper formatting for an AgentManifest-compliant API. Use this as a template for creating your own manifests.",
+  "categories": ["other"],
+  "primary_category": "reference",
+  "endpoints": [
+    {
+      "path": "/test",
+      "method": "GET",
+      "description": "Test endpoint for validation purposes. Returns a simple success message.",
+      "parameters": [],
+      "response_description": "Returns a JSON object with a success message confirming the endpoint is operational."
+    }
+  ],
+  "pricing": {
+    "model": "free",
+    "free_tier": {"queries_per_day": 1000, "queries_per_month": null},
+    "paid_tier": null,
+    "support_url": null
+  },
+  "authentication": {
+    "required": false,
+    "type": null,
+    "instructions": null
+  },
+  "reliability": {"maintained_by": "individual", "status_url": null, "expected_uptime_pct": 99},
+  "agent_notes": "This is a test manifest for validation purposes only. No account required. No authentication or api key needed. Pricing is free. It demonstrates proper formatting and minimum required field lengths for the AgentManifest specification.",
+  "contact": "test@example.com",
+  "listing_requested": true,
+  "last_updated": "2025-02-15T10:00:00Z"
+}

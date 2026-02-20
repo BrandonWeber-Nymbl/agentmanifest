@@ -1,0 +1,64 @@
+{
+  "spec_version": "agentmanifest-0.3",
+  "name": "GeoInsight Enrichment API",
+  "version": "3.0.0",
+  "description": "Real-time geospatial enrichment API providing property data, zoning information, flood risk scores, and demographic overlays for any US address or coordinate pair. Updated weekly from authoritative government sources.",
+  "homepage": "https://geoinsight.io",
+  "documentation": "https://geoinsight.io/docs",
+  "categories": ["geography", "finance"],
+  "primary_category": "enrichment",
+  "endpoints": [
+    {
+      "path": "/enrich",
+      "method": "POST",
+      "description": "Enrich an address or coordinate with property, zoning, risk, and demographic data.",
+      "parameters": [
+        {"name": "address", "type": "string", "required": false, "description": "A US street address."},
+        {"name": "lat", "type": "number", "required": false, "description": "Latitude."},
+        {"name": "lon", "type": "number", "required": false, "description": "Longitude."}
+      ],
+      "response_description": "Enrichment result with property value estimate, zoning class, flood zone.",
+      "cost_hint": {"unit": "request", "estimated_price": "0.05", "currency": "USD"}
+    }
+  ],
+  "authentication": {
+    "required": true,
+    "type": "api_key",
+    "instructions": "Obtain an API key via the AMP payment onboarding flow. Include the key in the X-API-Key header.",
+    "config": {"header": "X-API-Key"}
+  },
+  "pricing": {
+    "model": "usage_based",
+    "free_tier": null,
+    "paid_tier": {"amount_usd": 0.05, "unit": "request", "description": "$0.05 per enrichment request."}
+  },
+  "payment": {
+    "model": "per_request",
+    "currency": "USD",
+    "rates": [{"unit": "request", "price": "0.05", "description": "Per enrichment request"}],
+    "onboarding": {
+      "url": "https://geoinsight.io/amp/onboard",
+      "method": "POST",
+      "accepts": ["signed_jwt", "platform_token"],
+      "returns": {
+        "credential_type": "api_key",
+        "credential_field": "api_key",
+        "instructions": "Include the returned API key in the X-API-Key header on all requests.",
+        "expires_in": null
+      }
+    },
+    "usage_endpoint": {
+      "url": "https://geoinsight.io/amp/usage",
+      "method": "GET",
+      "authentication": "same_as_api"
+    },
+    "settlement": {"type": "real_time", "cycle": null},
+    "budget_controls": {"supports_spend_cap": true, "supports_per_request_limit": false, "supports_rate_limit": true}
+  },
+  "rate_limits": {"requests_per_minute": 60, "requests_per_day": 50000},
+  "reliability": {"uptime_percentage": 99.9, "avg_response_time_ms": 220},
+  "agent_notes": "To use this API, complete AMP payment onboarding by POSTing your agent payment credential to /amp/onboard. The onboarding flow returns an API key. Include this key in the X-API-Key header. Each request costs $0.05 USD, settled in real time. Budget controls support spend caps — declare your cap during onboarding. Check your usage at /amp/usage. Authentication is via API key. Pricing is per-request at $0.05. If budget is exceeded, you will receive a 402 response with resolution instructions.",
+  "contact": "api-support@geoinsight.io",
+  "listing_requested": true,
+  "last_updated": "2026-02-19T00:00:00Z"
+}

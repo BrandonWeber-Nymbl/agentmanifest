@@ -1,6 +1,11 @@
 import { Router, Request, Response } from 'express';
 import * as listingService from '../services/listing';
 import * as validatorService from '../services/validator';
+import {
+  normalizeContact,
+  extractMaintainedBy,
+  extractPaymentMetadata,
+} from '../lib/manifestMetadata';
 
 /** Extract badges from stored validation result. Registry computes display values from raw result. */
 function badgesFromValidationResult(vr: unknown): string[] {
@@ -32,24 +37,56 @@ router.get('/', async (req: Request, res: Response) => {
       category: req.query.category as string | undefined,
       primary_category: req.query.primary_category as string | undefined,
       pricing_model: req.query.pricing_model as string | undefined,
+      payment_model: req.query.payment_model as string | undefined,
+      payment_currency: req.query.payment_currency as string | undefined,
+      settlement_type: req.query.settlement_type as string | undefined,
+      supports_spend_cap:
+        req.query.supports_spend_cap === 'true'
+          ? true
+          : req.query.supports_spend_cap === 'false'
+            ? false
+            : undefined,
       auth_required:
         req.query.auth_required === 'true'
           ? true
           : req.query.auth_required === 'false'
-          ? false
-          : undefined,
+            ? false
+            : undefined,
+      maintained_by: req.query.maintained_by as string | undefined,
+      free_only: req.query.free_only === 'true',
+      badges: req.query.badges as string | undefined,
       q: req.query.q as string | undefined,
+      sort: req.query.sort as string | undefined,
+      limit: req.query.limit ? parseInt(String(req.query.limit), 10) : undefined,
+      offset: req.query.offset ? parseInt(String(req.query.offset), 10) : undefined,
     };
 
     const listings = await listingService.getAllListings(filters);
 
     res.json({
       meta: {
-        spec_version: 'agentmanifest-0.2',
+        spec_version: 'agentmanifest-0.3',
         endpoint_description:
-          'Returns all verified APIs in the AgentManifest registry. Use query parameters to filter by category, pricing model, authentication requirements, or search terms.',
+          'Returns all verified APIs in the AgentManifest registry. Filter by category, pricing, payment model, auth, badges, and more.',
+        query_params: {
+          category: 'Filter by category (e.g. chemistry, finance)',
+          primary_category: 'reference, live, computational, transactional, enrichment, personal, discovery',
+          pricing_model: 'free, per-query, subscription, tiered, usage_based',
+          payment_model: 'v0.3: per_request, metered_usage, prepaid_credits, subscription',
+          payment_currency: 'v0.3: USD, EUR, or x- prefixed',
+          settlement_type: 'v0.3: real_time, postpaid_cycle, prepaid_debit',
+          supports_spend_cap: 'v0.3: true to filter APIs with spend cap support',
+          auth_required: 'true or false',
+          maintained_by: 'individual, organization, community',
+          free_only: 'true for free APIs only',
+          badges: 'comma-separated: auth-verified, payment-ready, budget-aware',
+          q: 'Search name and description',
+          sort: 'name, created_at, verified_at',
+          limit: 'Max results (default 100, max 500)',
+          offset: 'Pagination offset',
+        },
         registry_notes:
-          'This registry indexes AI-agent-ready APIs that have passed AgentManifest spec validation. All listings are verified against live endpoints. Use the ?category and ?q parameters to find APIs relevant to your task.',
+          'This registry indexes AI-agent-ready APIs that have passed AgentManifest spec validation. All listings are verified against live endpoints.',
       },
       data: {
         count: listings.length,
@@ -61,9 +98,13 @@ router.get('/', async (req: Request, res: Response) => {
           primary_category: listing.primary_category,
           categories: listing.categories,
           pricing_model: listing.pricing_model,
+          payment_model: listing.payment_model,
+          payment_currency: listing.payment_currency,
+          settlement_type: listing.settlement_type,
+          supports_spend_cap: listing.supports_spend_cap,
           auth_required: listing.auth_required,
           maintained_by: listing.maintained_by,
-          badges: badgesFromValidationResult(listing.validation_result),
+          badges: listing.badges?.length ? listing.badges : badgesFromValidationResult(listing.validation_result),
           verified_at: listing.verified_at,
           last_checked_at: listing.last_checked_at,
         })),
@@ -73,7 +114,7 @@ router.get('/', async (req: Request, res: Response) => {
     console.error('Error fetching listings:', error);
     res.status(500).json({
       meta: {
-        spec_version: 'agentmanifest-0.2',
+        spec_version: 'agentmanifest-0.3',
         endpoint_description: 'Error occurred',
       },
       error: 'Internal server error',
@@ -91,8 +132,8 @@ router.get('/:id', async (req: Request, res: Response) => {
     if (!listing) {
       return res.status(404).json({
         meta: {
-          spec_version: 'agentmanifest-0.2',
-          endpoint_description: 'Listing not found',
+        spec_version: 'agentmanifest-0.3',
+        endpoint_description: 'Listing not found',
         },
         error: 'Not found',
         message: 'Listing with specified ID does not exist',
@@ -101,7 +142,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 
     res.json({
       meta: {
-        spec_version: 'agentmanifest-0.2',
+        spec_version: 'agentmanifest-0.3',
         endpoint_description:
           'Returns full details for a specific API listing including the complete stored manifest.',
       },
@@ -113,11 +154,15 @@ router.get('/:id', async (req: Request, res: Response) => {
         primary_category: listing.primary_category,
         categories: listing.categories,
         pricing_model: listing.pricing_model,
+        payment_model: listing.payment_model,
+        payment_currency: listing.payment_currency,
+        settlement_type: listing.settlement_type,
+        supports_spend_cap: listing.supports_spend_cap,
         auth_required: listing.auth_required,
         maintained_by: listing.maintained_by,
         contact: listing.contact,
         manifest: listing.manifest,
-        badges: badgesFromValidationResult(listing.validation_result),
+        badges: listing.badges?.length ? listing.badges : badgesFromValidationResult(listing.validation_result),
         check_status: listing.check_status,
         verified_at: listing.verified_at,
         last_checked_at: listing.last_checked_at,
@@ -129,7 +174,7 @@ router.get('/:id', async (req: Request, res: Response) => {
     console.error('Error fetching listing:', error);
     res.status(500).json({
       meta: {
-        spec_version: 'agentmanifest-0.2',
+        spec_version: 'agentmanifest-0.3',
         endpoint_description: 'Error occurred',
       },
       error: 'Internal server error',
@@ -178,7 +223,7 @@ router.post('/submit', async (req: Request, res: Response) => {
 
     res.status(202).json({
       meta: {
-        spec_version: 'agentmanifest-0.2',
+        spec_version: 'agentmanifest-0.3',
         endpoint_description:
           'Submission accepted. Validation is running asynchronously.',
       },
@@ -214,7 +259,7 @@ router.get('/submit/:id/status', async (req: Request, res: Response) => {
 
     const response: any = {
       meta: {
-        spec_version: 'agentmanifest-0.2',
+        spec_version: 'agentmanifest-0.3',
         endpoint_description: 'Returns the current status of a submission',
       },
       data: {
@@ -267,6 +312,7 @@ async function processSubmission(submissionId: string, url: string) {
 
     // Fetch manifest
     const manifest = await validatorService.fetchManifest(url);
+    const paymentMeta = extractPaymentMetadata(manifest);
 
     // Create listing
     const listing = await listingService.createListing({
@@ -276,10 +322,15 @@ async function processSubmission(submissionId: string, url: string) {
       primary_category: manifest.primary_category,
       categories: manifest.categories,
       pricing_model: manifest.pricing.model,
+      payment_model: paymentMeta.payment_model ?? undefined,
+      payment_currency: paymentMeta.payment_currency ?? undefined,
+      settlement_type: paymentMeta.settlement_type ?? undefined,
+      supports_spend_cap: paymentMeta.supports_spend_cap ?? undefined,
       auth_required: manifest.authentication.required,
-      maintained_by: manifest.reliability.maintained_by,
-      contact: manifest.contact,
+      maintained_by: extractMaintainedBy(manifest),
+      contact: normalizeContact(manifest.contact),
       manifest,
+      badges: (validationResult as { badges?: string[] }).badges ?? [],
       validation_result: validationResult as any,
       verification_token: validationResult.verification_token || undefined,
       check_status: 'verified',

@@ -12,15 +12,46 @@ interface ValidationCheck {
 }
 
 export interface ManifestForAuthPayment {
+  spec_version?: string;
   authentication?: {
     required: boolean;
     type?: string | null;
     instructions?: string | null;
   };
-  payment?: {
+  payment?: null | {
+    // v0.2 legacy fields
     checkout_url?: string;
     key_provisioning_url?: string;
     prepay_required?: boolean;
+    // v0.3 fields
+    model?: string;
+    currency?: string;
+    rates?: Array<{ unit: string; price: string }>;
+    onboarding?: {
+      url: string;
+      method: string;
+      accepts: string[];
+      returns: {
+        credential_type: string;
+        credential_field: string;
+        instructions: string;
+      };
+    };
+    usage_endpoint?: {
+      url: string;
+      method: string;
+      authentication: string;
+    };
+    settlement?: {
+      type: string;
+      cycle?: string | null;
+    };
+    budget_controls?: {
+      supports_spend_cap?: boolean;
+      supports_per_request_limit?: boolean;
+      supports_rate_limit?: boolean;
+      supports_alerting?: boolean;
+    };
   };
   pricing?: {
     model?: string;
@@ -494,6 +525,104 @@ async function verifyPaymentFlow(
 }
 
 /**
+ * v0.3 payment flow verification.
+ * Verifies that the onboarding and usage endpoints are reachable.
+ * Does NOT send real credentials or process payments.
+ */
+async function verifyV03PaymentFlow(
+  manifest: ManifestForAuthPayment,
+  baseUrl: string | null
+): Promise<{ payment_flow_verified: boolean; checks: ValidationCheck[] }> {
+  const checks: ValidationCheck[] = [];
+  const payment = manifest.payment;
+
+  if (!payment?.model || payment.model === 'free') {
+    return { payment_flow_verified: false, checks };
+  }
+
+  if (!payment.onboarding?.url) {
+    checks.push({
+      name: 'v03_payment_onboarding_reachable',
+      passed: false,
+      message: 'v0.3 payment declared but onboarding.url is missing',
+      severity: 'warning',
+    });
+    return { payment_flow_verified: false, checks };
+  }
+
+  if (!baseUrl) {
+    checks.push({
+      name: 'v03_payment_onboarding_reachable',
+      passed: false,
+      message: 'Cannot verify onboarding endpoint without base URL',
+      severity: 'info',
+    });
+    return { payment_flow_verified: false, checks };
+  }
+
+  let onboardingOk = false;
+
+  // Check onboarding URL reachability (HEAD then GET)
+  try {
+    const headRes = await fetchWithTimeout(payment.onboarding.url, { method: 'HEAD' });
+    if (headRes.status === 405) {
+      // Try GET if HEAD not supported
+      const getRes = await fetchWithTimeout(payment.onboarding.url, { method: 'GET' });
+      onboardingOk = getRes.status < 500;
+    } else {
+      onboardingOk = headRes.status < 500;
+    }
+  } catch (error) {
+    checks.push({
+      name: 'v03_payment_onboarding_reachable',
+      passed: false,
+      message: `Onboarding endpoint unreachable: ${(error as Error).message}`,
+      severity: 'warning',
+    });
+  }
+
+  if (onboardingOk) {
+    checks.push({
+      name: 'v03_payment_onboarding_reachable',
+      passed: true,
+      message: 'Payment onboarding endpoint is reachable',
+      severity: 'info',
+    });
+  }
+
+  // Check usage endpoint reachability if declared
+  if (payment.usage_endpoint?.url) {
+    try {
+      const usageRes = await fetchWithTimeout(payment.usage_endpoint.url, { method: 'HEAD' });
+      if (usageRes.status < 500) {
+        checks.push({
+          name: 'v03_payment_usage_reachable',
+          passed: true,
+          message: 'Usage endpoint is reachable',
+          severity: 'info',
+        });
+      } else {
+        checks.push({
+          name: 'v03_payment_usage_reachable',
+          passed: false,
+          message: `Usage endpoint returned ${usageRes.status}`,
+          severity: 'warning',
+        });
+      }
+    } catch (error) {
+      checks.push({
+        name: 'v03_payment_usage_reachable',
+        passed: false,
+        message: `Usage endpoint unreachable: ${(error as Error).message}`,
+        severity: 'warning',
+      });
+    }
+  }
+
+  return { payment_flow_verified: onboardingOk, checks };
+}
+
+/**
  * Validate auth and payment.
  */
 export async function validateAuthAndPayment(
@@ -501,7 +630,16 @@ export async function validateAuthAndPayment(
   baseUrl: string | null
 ): Promise<AuthPaymentResult> {
   const authResult = await verifyAuthentication(manifest, baseUrl);
-  const paymentResult = await verifyPaymentFlow(manifest, baseUrl);
+
+  // Determine which payment verification to run based on spec version
+  const isV03 = manifest.spec_version === 'agentmanifest-0.3' && manifest.payment?.model;
+
+  let paymentResult: { payment_flow_verified: boolean; checks: ValidationCheck[] };
+  if (isV03) {
+    paymentResult = await verifyV03PaymentFlow(manifest, baseUrl);
+  } else {
+    paymentResult = await verifyPaymentFlow(manifest, baseUrl);
+  }
 
   return {
     auth_verified: authResult.auth_verified,

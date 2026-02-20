@@ -15,10 +15,15 @@ model Listing {
   primary_category  String
   categories        String[]
   pricing_model     String
+  payment_model     String?   // v0.3: from manifest.payment?.model
+  payment_currency  String?   // v0.3: from manifest.payment?.currency
+  settlement_type   String?   // v0.3: real_time, postpaid_cycle, prepaid_debit
+  supports_spend_cap Boolean? // v0.3: from manifest.payment?.budget_controls?.supports_spend_cap
   auth_required     Boolean
   maintained_by     String
   contact           String
   manifest          Json
+  badges            String[]  @default([]) // Extracted for filtering: auth-verified, payment-ready, budget-aware
   validation_result Json?
   verification_token String?
   verified_at       DateTime?
@@ -31,5 +36,8 @@ model Listing {
   @@index([primary_category])
   @@index([check_status])
   @@index([pricing_model])
+  @@index([payment_model])
   @@index([auth_required])
+  @@index([maintained_by])
+  @@index([badges])
 }

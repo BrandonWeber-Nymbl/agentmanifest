@@ -1,0 +1,35 @@
+{
+  "spec_version": "agentmanifest-0.3",
+  "name": "Paid API No Payment Terms",
+  "version": "1.0.0",
+  "description": "This manifest has a v0.3 payment block but agent_notes does not mention payment, onboarding, or budget. Should pass validation but yield a warning for operational completeness.",
+  "categories": ["other"],
+  "primary_category": "reference",
+  "endpoints": [
+    {
+      "path": "/test",
+      "method": "GET",
+      "description": "Test endpoint for validation purposes.",
+      "parameters": [],
+      "response_description": "Returns a simple response."
+    }
+  ],
+  "authentication": {"required": true, "type": "api_key", "instructions": "Get key from dashboard. Use X-API-Key header."},
+  "pricing": {"model": "usage_based", "free_tier": null, "paid_tier": {"amount_usd": 0.01, "unit": "request", "description": "Per request."}},
+  "payment": {
+    "model": "per_request",
+    "currency": "USD",
+    "rates": [{"unit": "request", "price": "0.01"}],
+    "onboarding": {
+      "url": "https://example.com/amp/onboard",
+      "method": "POST",
+      "accepts": ["signed_jwt", "platform_token"],
+      "returns": {"credential_type": "api_key", "credential_field": "api_key", "instructions": "Use X-API-Key header."}
+    },
+    "settlement": {"type": "real_time", "cycle": null}
+  },
+  "agent_notes": "This API requires an account. Authentication is via API key in the X-API-Key header. Pricing and cost information: $0.01 per request. Free tier not available. Contact support for more details. This has account, auth, and pricing . Terms and conditions apply. Must be 150 chars for v0.3.",
+  "contact": "test@example.com",
+  "listing_requested": false,
+  "last_updated": "2026-02-19T00:00:00Z"
+}

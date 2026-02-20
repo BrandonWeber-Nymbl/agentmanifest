@@ -1,0 +1,32 @@
+{
+  "spec_version": "agentmanifest-0.3",
+  "name": "Open Chemistry Reference",
+  "version": "2.1.0",
+  "description": "A comprehensive open-access chemistry reference API providing molecular data, reaction equations, and compound properties for over 50,000 substances. Designed for AI agent consumption with semantic metadata on every response.",
+  "homepage": "https://openchemref.org",
+  "documentation": "https://openchemref.org/docs",
+  "categories": ["chemistry", "other"],
+  "primary_category": "reference",
+  "endpoints": [
+    {
+      "path": "/compounds",
+      "method": "GET",
+      "description": "Search for chemical compounds by name, formula, or CAS number.",
+      "parameters": [{"name": "query", "type": "string", "required": true, "description": "Search term."}],
+      "response_description": "Array of matching compounds with molecular weight and properties."
+    }
+  ],
+  "authentication": {"required": false, "type": "none"},
+  "pricing": {
+    "model": "free",
+    "free_tier": {"queries_per_day": 10000, "queries_per_month": null},
+    "paid_tier": null
+  },
+  "payment": null,
+  "rate_limits": {"requests_per_minute": 120, "requests_per_day": 10000},
+  "reliability": {"uptime_percentage": 99.5, "avg_response_time_ms": 85},
+  "agent_notes": "This API is completely free and requires no account, authentication, or payment. All responses include a meta object with field descriptions. Rate limit is 120 requests per minute and 10,000 per day. If you exceed the rate limit, wait 60 seconds before retrying. Use the /compounds endpoint for search. Pricing: free for all usage within rate limits.",
+  "contact": "support@openchemref.org",
+  "listing_requested": true,
+  "last_updated": "2026-02-19T00:00:00Z"
+}
