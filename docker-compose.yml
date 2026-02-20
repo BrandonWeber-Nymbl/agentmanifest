@@ -4,7 +4,7 @@ services:
     container_name: agentmanifest-db
     environment:
       POSTGRES_USER: agentmanifest
-      POSTGRES_PASSWORD: agentmanifest_dev
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env for local dev}
       POSTGRES_DB: agentmanifest_registry
     ports:
       - "5432:5432"
@@ -25,7 +25,7 @@ services:
       - "3001:3001"
     environment:
       PORT: 3001
-      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      JWT_SECRET: ${JWT_SECRET:?Set JWT_SECRET in .env for local dev}
       NODE_ENV: development
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
@@ -42,7 +42,7 @@ services:
       - "3002:3002"
     environment:
       PORT: 3002
-      DATABASE_URL: postgresql://agentmanifest:agentmanifest_dev@postgres:5432/agentmanifest_registry
+      DATABASE_URL: postgresql://agentmanifest:${POSTGRES_PASSWORD}@postgres:5432/agentmanifest_registry
       VALIDATOR_URL: http://validator:3001
       REGISTRY_URL: http://localhost:3002
       NODE_ENV: development

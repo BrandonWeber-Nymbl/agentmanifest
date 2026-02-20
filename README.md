@@ -209,6 +209,10 @@ If validation passes, your API is now publicly listed and discoverable by agents
 # Clone and navigate to the repo
 cd agentmanifest
 
+# Create .env with required secrets for local dev (not committed):
+# POSTGRES_PASSWORD=your-password
+# JWT_SECRET=$(openssl rand -hex 32)
+
 # Start everything
 docker-compose up -d
 
